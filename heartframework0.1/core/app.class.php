@@ -20,7 +20,6 @@ class app {
 
 		app::init_handle('index1Controller');
 		dispatcher::dispatch();//执行调度
-		print_r($_GET);
 	}
 
 	static public function init_handle($classname) {
@@ -33,21 +32,48 @@ class app {
 	 */
 	static public function autoload($classname) {
 		global $conf;
-		echo $classname;
+		$libsclass = ' template, cookie,';
+		$core_path = HEART_FRAMEWORK.'core/';
+		if(substr($classname, 0,7) == 'helper_') {//助手
+			$helper_path = $conf['helper_path'].$classname.'.php';
+			if(is_file($helper_path)) {
+				include $helper_path;
+				return class_exists($classname,false);
+			} else {
+				throw new Exception('URL错误，或文件不存在');
+			}
+		} elseif(substr($classname, 0,5) == 'base_') {//核心基础base
+			if(is_file($core_path.$classname.'.class.php')) {
+				include $core_path.$classname.'.class.php';
+				return class_exists($classname,false);
+			}
+		}
+
+		if($s = strpos($libsclass, $classname)) {
+			$libs_path = HEART_FRAMEWORK.'libs/'.$classname.'.class.php';
+			if(is_file($libs_path)) {
+				include $libs_path;
+				return class_exists($classname, false);
+			}
+		}
+
+		return true;
 		
 	}
 
 	static public function run() {
 		global $conf;
+		$directory = (core::get_directory_name()) ? core::get_directory_name().'/' : '';
 		$control = core::get_model_name();
 		$action  = core::get_action_name();
-	
+
 		$control_name = $control.'Controller';
 		if(!empty($conf['controller_path']) && isset($conf['controller_path'])) {
 			$paths = $conf['controller_path'];
 
 			foreach($paths as $path) {
-				$control_file = $path.$control_name.'.php';
+				$control_file = $path.$directory.$control_name.'.php';
+
 				if(is_file($control_file)) {
 					break;
 				} else {
@@ -55,15 +81,17 @@ class app {
 				}
 			}
 
-			if(@include $control_file) {
+			if(!empty($control_file)) {
+				include $control_file;
 				$newcontrol = new $control_name();
+		
 				if(method_exists($newcontrol, $action)) {
 					$newcontrol->$action();
 				} else {
-					throw new Exception('$action 不存在');
+					throw new Exception("$action 不存在");
 				}
 			} else {
-				throw new Exception("$control 不存在");
+				throw new Exception("您当前URL不正确，请检查！");
 			}
 		}
 

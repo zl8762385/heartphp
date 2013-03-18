@@ -8,7 +8,7 @@
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
  */
-class indexController extends helper_baseadminController {
+class listsController extends helper_baseadminController {
 
 	public function content() {
 		$lists = array('11','222','333');

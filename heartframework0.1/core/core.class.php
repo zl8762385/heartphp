@@ -21,20 +21,28 @@ class core {
 			return NULL;
 		}
 	}
+	/**
+	 * 获取类名
+	 */
+	static public function get_directory_name() {
+		$get['d'] = (!empty($_GET['d']) && isset($_GET['d'])) ? $_GET['d'] : '' ;
+		return $get['d'];
+	}
 
 	/**
 	 * 获取类名
 	 */
 	static public function get_model_name() {
-		$get['m'] = $_GET['m'];
-		return $get['m'];
+		$get['c'] = $_GET['c'];
+		return $get['c'];
 	}
 
 	/**
 	 * 获取实际操作方法名
 	 */
 	static public function get_action_name() {
-		$get['c'] = $_GET['c'];
-		return $get['c'];
+		$get['m'] = $_GET['m'];
+		return $get['m'];
 	}
+
 }

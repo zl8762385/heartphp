@@ -29,3 +29,7 @@ statics //静态目录
 
 index.php //入口文件
 api.php //API入口
+
+
+
+class indexController extends helper_baseadminController {  继承使用助手文件

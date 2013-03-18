@@ -17,14 +17,22 @@ return array(
 	'model_path' => array(SYSTEM_PATH.'lib/model/'),
 	//控制器
 	'controller_path' => array(SYSTEM_PATH.'lib/controller/'),
+	//助手
+	'helper_path' => SYSTEM_PATH.'lib/helper/',
 	//日志
 	'log_path' => array(SYSTEM_PATH.'data/log/'),
 	//插件
 	'plugin_path' => array(SYSTEM_PATH.'plugin/'),
 	//静态文件
 	'statics_path' => array(SYSTEM_PATH.'statics/'),
-	//临时目录
-	'tmp_path' => array(SYSTEM_PATH.'tmp/'),
-	'path_info' => '1' //开启pathinfo  {1:开启, 0:关闭}
+	'path_info' => 1, //开启pathinfo  {1:开启, 0:关闭}
+
+	//配置模板信息
+	'template_config' => array(
+		'template_type'      => '.tpl',
+		'template_path'      => SYSTEM_PATH.'tpl/',
+		'template_tag_left'  => '<{', //左标签
+		'template_tag_right' => '}>' //右标签
+	)
 
 );
