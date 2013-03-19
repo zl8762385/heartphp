@@ -1,6 +1,6 @@
 <?php
 /**
- *  app.class.php  应用类
+ *  app.class.php  应用类 框架入口
  *
  * @copyright			(C) 20013-2015 HeartPHP
  * @author              zhangxiaoliang
@@ -40,7 +40,7 @@ class app {
 				include $helper_path;
 				return class_exists($classname,false);
 			} else {
-				throw new Exception('URL错误，或文件不存在');
+				core::show_error("URL错误，或文件不存在");
 			}
 		} elseif(substr($classname, 0,5) == 'base_') {//核心基础base
 			if(is_file($core_path.$classname.'.class.php')) {
@@ -88,10 +88,11 @@ class app {
 				if(method_exists($newcontrol, $action)) {
 					$newcontrol->$action();
 				} else {
-					throw new Exception("$action 不存在");
+			
+					core::show_error("$action 未找到");
 				}
 			} else {
-				throw new Exception("您当前URL不正确，请检查！");
+				core::show_error("您当前URL不正确，请检查！");
 			}
 		}
 

@@ -12,17 +12,19 @@ class indexController extends helper_baseadminController {
 
 	public function content() {
 		$lists = array('11','222','333');
-		$content = 'fsdfdffsdf';
+		$content = '来测试内容content';
+		$zhangliang = 'wo jiu shi zhangliang';
+		$this->view->assign('zhangliang', $zhangliang);
 		$this->view->assign('content', $content);
 		$this->view->assign('list', $lists);
-		$this->view->display();
+		$this->view->display('zhang');
 	}
 
 	public function lists() {
 		$lists = array('333','444','555');
 		$content = 'lists';
 		$this->view->assign('content', $content);
-		$this->view->assign('list', $lists);
+		//$this->view->assign('list', $lists);
 		$this->view->display();
 	}
 }

@@ -8,6 +8,7 @@
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
  */
+define('IS_HEARTPHP', TRUE);
 
 define('DEBUG', 1);
 define('SYSTEM_PATH', str_replace('\\', '/', substr(__FILE__, 0, -9)));

@@ -29,10 +29,9 @@ return array(
 
 	//配置模板信息
 	'template_config' => array(
-		'template_type'      => '.tpl',
+		'template_suffix'    => '.html',
 		'template_path'      => SYSTEM_PATH.'tpl/',
-		'template_tag_left'  => '<{', //左标签
-		'template_tag_right' => '}>' //右标签
+		'template_c'         => SYSTEM_PATH.'data/template_c/'
 	)
 
 );
