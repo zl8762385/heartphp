@@ -2,27 +2,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>/ad/index/test111112423	ooooo321o</title>
+<title>/ad/index/test222</title>
 
 <meta name="baidu-site-verification" content="lnq7Ugb41pCq6Azs" />
 
 </head>
 
 <body>
-888hhhhhhhhhhhhh
 <{echo $content}>
 <{print_r($list)}>
-3213
-<{foreach   from=$list1   item=v1   key=myid1}>
-9999
-<{/foreach}>
 
-<{foreach from=$list2 item=v2 key=myid2 zhangliang=1}>
-9999
-<{/foreach}>
 
-<{foreach from=$list3 item=v3 key=myid3}>
-9999
+<{foreach item=v from=$list}>
+	第一个:<{echo $v}><br/>
+		<{foreach item=v1 from=$list}>
+			第二个:<{echo $v1}>&nbsp;&nbsp;<br/>
+				<{foreach item=v2 from=$list}>
+					第三个:<{echo $v2}>&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+				<{/foreach}>
+		<{/foreach}>
 <{/foreach}>
 </body>
 </html>

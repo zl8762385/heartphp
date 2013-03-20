@@ -1,9 +1,9 @@
-<? if(!defined('IS_HEARTPHP')) exit('Access Denied');/*Create On##2013-03-19 23:53:43|Compiled from##D:/PHPnow/htdocs/heartphp/tpl/ad/index/zhang.html*/?>
+<? if(!defined('IS_HEARTPHP')) exit('Access Denied');/*Create On##2013-03-20 20:13:10|Compiled from##D:/PHPnow/htdocs/heartphp/tpl/ad/index/testzhangliang.html*/?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>/ad/index/test</title>
+<title>/ad/index/test222</title>
 
 <meta name="baidu-site-verification" content="lnq7Ugb41pCq6Azs" />
 
