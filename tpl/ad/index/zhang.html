@@ -9,20 +9,53 @@
 </head>
 
 <body>
-888hhhhhhhhhhhhh
-<{echo $content}>
-<{print_r($list)}>
-3213
-<{foreach   from=$list1   item=v1   key=myid1}>
-9999
+模板标签：if 判断语句
+<{if empty($zhang1)}>
+	zhang
+	<{$header}>
+<{elseif empty($liang)}>
+<{elseif empty($liang)}>
+<{elseif empty($liang)}>
+	liang
+<{else}>
+	zhangliang
+<{/if}>
+
+模板标签: include 调用其他模板 11111111
+<{include file="comm/header" compile="true"}>
+模板标签：foreach 循环
+<{foreach from=$lists key=kk item=value1 uuu=zhangliang}>
+嵌套1
+	<{foreach from=$lists item=value11 key=kk}>
+	嵌套2
+		<{foreach from=$lists item=value12 key=kk}>
+		嵌套3
+		<{/foreach}>
+	<{/foreach}>
 <{/foreach}>
 
-<{foreach from=$list2 item=v2 key=myid2 zhangliang=1}>
-9999
+<{foreach from=$lists item=value2}>
+嵌套1
+	<{foreach from=$lists item=value21}>
+	嵌套2
+		<{foreach from=$lists item=value22}>
+		嵌套3
+			<{foreach from=$lists item=value23}>
+			嵌套4
+			<{/foreach}>
+		<{/foreach}>
+	<{/foreach}>
 <{/foreach}>
 
-<{foreach from=$list3 item=v3 key=myid3}>
-9999
+
+<{foreach from=$lists item=value3}>
+嵌套
 <{/foreach}>
+
+<{foreach from=$lists item=value4}>
+嵌套
+<{/foreach}>
+
+<{include file="comm/footer" compile="true"}>
 </body>
 </html>

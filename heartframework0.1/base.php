@@ -24,6 +24,8 @@ if(DEBUG) {
 
 
 } else {
-
-	echo '非调试状态，留位置，以后把所有类继承到一个文件里';
+	include HEART_FRAMEWORK.'core/dispatcher.class.php';
+	include HEART_FRAMEWORK.'core/core.class.php';
+	include HEART_FRAMEWORK.'core/app.class.php';
+	//echo '非调试状态，留位置，以后把所有类继承到一个文件里';
 }

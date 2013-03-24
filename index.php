@@ -10,6 +10,7 @@
  */
 define('IS_HEARTPHP', TRUE);
 
+//开启DEBUG模式  模板引擎会一直处于编译状态，建议上线后DEBUG改成0
 define('DEBUG', 1);
 define('SYSTEM_PATH', str_replace('\\', '/', substr(__FILE__, 0, -9)));
 

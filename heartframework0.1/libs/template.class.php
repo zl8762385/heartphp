@@ -21,14 +21,42 @@ class template {
 	private $template_path = '';//模板完整路径 D:/PHPnow/htdocs/heartphp/tpl/ad/index/
 	private $template_name = '';//模板名称 index.html
 
-	//模板标签定义
-	private $tag_foreach = array('from', 'item', 'key');//foreach 标签
+
+	//定义每个模板的标签的元素
+	private $tag_foreach = array('from', 'item', 'key');
+	private $tag_include = array('file');//目前只支持读取模板默认路径
 
 	public function __construct($conf) {
 		$this->conf = &$conf;
 
 		$this->template_c = $this->conf['template_config']['template_c'];//编译目录
 		$this->_tpl_suffix = $this->tpl_suffix();
+	}
+
+
+	/**
+	 * 重构str_replace
+	 * @param $search 搜索字符串
+	 * @param $replace 替换字符串
+	 * @param $content 内容
+	 * @return html
+	 */
+	private function str_replace($search, $replace, $content) {
+		if(empty($search) || empty($replace) || empty($content)) return false;
+		return str_replace($search, $replace, $content);
+	}
+
+	/**
+	 * preg_match_all
+	 * @param $pattern 正则
+	 * @param $content 内容
+	 * @return array
+	 */
+
+	private function preg_match_all($pattern, $content) {
+		if(empty($pattern) || empty($content)) core::show_error('查找模板标签失败!');
+		preg_match_all("/".$this->template_tag_left.$pattern.$this->template_tag_right."/is", $content, $match);
+		return $match;
 	}
 	/**
 	 * 模板文件后缀 
@@ -69,7 +97,7 @@ class template {
 	private function compile() {
 		$filepath = $this->template_path.$this->template_name;
 
-		$include_file = $this->template_replace($this->r_file($filepath));//解析
+		$include_file = $this->template_replace($this->read_file($filepath));//解析
 		if($include_file) {
 			extract($this->vars, EXTR_SKIP);
 			@include $include_file;
@@ -84,52 +112,232 @@ class template {
 	private function template_replace($str) {
 		if(empty($str)) core::show_error('模板内容为空！');
 
-		$left = $this->template_tag_left;
-		$right = $this->template_tag_right;
+		
 
-		//规则先替换 函数部分，当函数部分全部替换完成 剩下的标签 前部转换成PHP代码.
-		//foreach
-		/*
-			$str = preg_replace("/".$left."foreach\s+item=(\w+)\s+from=(.+?)".$right."/is", "<?php foreach($2 as $$1) { ?>", $str);
-			$str = preg_replace("/".$left."\/foreach".$right."/is", "<?php } ?>", $str);
-		*/
-
-		///////////////////////////////////////////////////////苍天啊 感觉这个标签不符合我，我准备花时间从新写
-		//开始测试单独解析模板引擎
-		//$this->parse_foreach($str);
-		//将剩下的标签前部转换成PHP代码
-		$str = preg_replace("/".$left."(.+?)".$right."/is", "<?php $1 ?>", $str);
-
-		$header_comment = "Create On##".time()."|Compiled from##".$this->template_path.$this->template_name;
-		$template = "<? if(!defined('IS_HEARTPHP')) exit('Access Denied');/*{$header_comment}*/?>\r\n$str";
-
-		$vars_template_c = $this->check_template_c();
+		$compile_dirpath = $this->check_temp_compile();//检查模板编译鲁姆
 		$vars_template_c_name = str_replace($this->_tpl_suffix, '', $this->template_name);
 
 		//处理编译头部
-		$template_c_filepath = $vars_template_c.$vars_template_c_name.$this->tpl_compile_suffix;//编译文件
+		$compile_path = $compile_dirpath.$vars_template_c_name.$this->tpl_compile_suffix;//编译文件
+		if(is_file($compile_path)) {
+			$header_content = $this->get_compile_header($compile_path);
+			$compile_date = $this->get_compile_header_comment($header_content);
 
-		$header_content = $this->get_compile_header($template_c_filepath);
-		$prev_compile_date = $this->get_compile_header_comment($header_content);
-
-		$template_filename = $this->template_path.$this->template_name;//模板文件
-
-		if(filemtime($template_filename) > $prev_compile_date) {//对比 模板文件查看是否大于上一次编译时间
-			//缓存已经过期
-			$return_c_file = $this->c_file($vars_template_c_name, $template, $vars_template_c);//编译模板
-		} else {
-			$return_c_file = $template_c_filepath;
+			//如果文件过期编译   当模板标签有include并且有修改时 也重新编译
+			if(filemtime($this->template_path.$this->template_name) > $compile_date|| DEBUG) {
+				$ret_file = $this->compile_file($vars_template_c_name, $str, $compile_dirpath);
+			} else {
+				$ret_file = $compile_path;
+			}
+		} else {//编译文件不存在 创建他
+			$ret_file = $this->compile_file($vars_template_c_name, $str, $compile_dirpath);
 		}
 
-		return $return_c_file;
+		return $ret_file;
+	}
+
+
+	/**
+	 *	模板文件主体
+	 * 	@param  string  $str    内容
+	 *  @return html
+	 */
+	private function body_content($str) {
+		//解析
+		$str = $this->parse($str);
+
+		$header_comment = "Create On##".time()."|Compiled from##".$this->template_path.$this->template_name;
+		$content = "<? if(!defined('IS_HEARTPHP')) exit('Access Denied');/*{$header_comment}*/?>\r\n$str";
+
+		return $content;
 	}
 
 	/**
-	 *  检查编译目录	
+	 *  开始解析相关模板标签
+	 * @param $content 模板内容
+	 */
+	private function parse($content) {
+		echo 'content';
+		//foreach
+		$content = $this->parse_foreach($content);
+
+		//include
+		$content = $this->parse_include($content);
+
+		//if
+		$content = $this->parse_if($content);
+
+		//elseif
+		$content = $this->parse_elseif($content);
+
+		//模板标签公用部分
+		$content = $this->parse_comm($content);	
+
+		//转为PHP代码
+		$content = $this->parse_php($content);
+		return $content;
+	}
+
+	/**
+	 * 转换为PHP
+	 * @param $content html 模板内容
+	 * @return html 替换好的HTML
+	 */
+	private function parse_php($content){
+		if(empty($content)) return false;
+		$content = preg_replace("/".$this->template_tag_left."(.+?)".$this->template_tag_right."/is", "<?php $1 ?>", $content);
+
+		return $content;
+	}
+	/**
+	 * if判断语句
+	 * <{if empty($zhang)}>
+	 * zhang
+	 * <{elseif empty($liang)}>
+	 * 	liang
+	 * <{else}>
+	 * 	zhangliang
+	 * <{/if}>
+	 */
+	private function parse_if($content) {
+		if(empty($content)) return false;
+		//preg_match_all("/".$this->template_tag_left."if\s+(.*?)".$this->template_tag_right."/is", $content, $match);
+
+		$match = $this->preg_match_all("if\s+(.*?)", $content);
+		if(!isset($match[1]) || !is_array($match[1])) return $content;
+
+		foreach($match[1] as $k => $v) {
+			$s = preg_split("/\s+/is", $v);
+			$s = array_filter($s);
+			$content = str_replace($match[0][$k], "<?php if({$s[0]}) { ?>", $content);
+		}
+
+		return $content;
+	}
+
+	private function parse_elseif($content) {
+		if(empty($content)) return false;
+		//preg_match_all("/".$this->template_tag_left."elseif\s+(.*?)".$this->template_tag_right."/is", $content, $match);
+		$match = $this->preg_match_all("elseif\s+(.*?)", $content);
+		if(!isset($match[1]) || !is_array($match[1])) return $content;
+
+		foreach($match[1] as $k => $v) {
+			$s = preg_split("/\s+/is", $v);
+			$s = array_filter($s);
+			$content = str_replace($match[0][$k], "<?php } elseif ({$s[0]}) { ?>", $content);
+		}
+
+		return $content;
+	}
+	/**
+	 * 解析 include    include标签不是实时更新的  当主体文件更新的时候 才更新标签内容，所以想include生效 请修改一下主体文件
+	 * 使用方法 <{include file=""}>
+	 * @param $content 模板内容
+	 * @return html
+	 */
+	private function parse_include($content) {
+		if(empty($content)) return false;
+
+		//preg_match_all("/".$this->template_tag_left."include\s+(.*?)".$this->template_tag_right."/is", $content, $match);
+		$match = $this->preg_match_all("include\s+(.*?)", $content);
+		if(!isset($match[1]) || !is_array($match[1])) return $content;
+
+		foreach($match[1] as $match_key => $match_value) {
+			$a = preg_split("/\s+/is", $match_value);
+
+			$new_tag = array();
+			//分析元素
+			foreach($a as $t) {
+				$b = explode('=', $t);
+				if(in_array($b[0], $this->tag_include)) {
+					if(!empty($b[1])) {
+						$new_tag[$b[0]] = str_replace("\"", "", $b[1]);
+					} else {
+						core::show_error('模板路径不存在!');
+					}
+				}
+			}
+
+			extract($new_tag);
+			//查询模板文件
+			foreach($this->conf['view_path'] as $v){
+				$conf_view_tpl = $v.$file.$this->_tpl_suffix;//include 模板文件
+				if(is_file($conf_view_tpl)) {
+					$c = $this->read_file($conf_view_tpl);
+					break;
+				} else {
+					core::show_error('模板文件不存在,请仔细检查 文件:'. $conf_view_tpl);
+				}
+			} 
+	
+			$content = str_replace($match[0][$match_key], $c, $content);
+		}
+
+		return $content;
+			
+	}
+	/**
+	 * 解析 foreach
+	 * 使用方法 <{foreach from=$lists item=value key=kk}>
+	 * @param $content 模板内容
+	 * @return html 解析后的内容
+	 */
+	private function parse_foreach($content) {
+		if(empty($content)) return false;
+
+		//preg_match_all("/".$this->template_tag_left."foreach\s+(.*?)".$this->template_tag_right."/is", $content, $match);
+		$match = $this->preg_match_all("foreach\s+(.*?)", $content);
+		if(!isset($match[1]) || !is_array($match[1])) return $content;
+
+		foreach($match[1] as $match_key => $value) {
+	
+			$split = preg_split("/\s+/is", $value);
+			$split = array_filter($split);
+
+			$new_tag = array();
+			foreach($split as $v) {
+				$a = explode("=", $v);
+				if(in_array($a[0], $this->tag_foreach)) {//此处过滤标签 不存在过滤
+					$new_tag[$a[0]] = $a[1];
+				}
+			}
+			$key = '';
+
+			extract($new_tag);
+			$key = ($key) ? '$'.$key.'=>' : '' ;
+			$s = '<?php foreach('.$from.' as '.$key.' $'.$item.') { ?>';
+			$content = $this->str_replace($match[0][$match_key], $s, $content);
+
+		}
+
+		return $content;
+	}
+
+	/**
+	 * 匹配结束 字符串
+	 */
+	private function parse_comm($content) {
+		$search = array(
+			"/".$this->template_tag_left."\/foreach".$this->template_tag_right."/is",
+			"/".$this->template_tag_left."\/if".$this->template_tag_right."/is",
+			"/".$this->template_tag_left."else".$this->template_tag_right."/is",
+
+		);
+
+		$replace = array(
+			"<?php } ?>",
+			"<?php } ?>",
+			"<?php } else { ?>"
+		);
+		$content = preg_replace($search, $replace, $content);
+		return $content;
+	}
+	/**
+	 *  检查编译目录	如果没有创建 则递归创建目录
 	 * 	@param  string  $path   文件完整路径
 	 *  @return 模板内容
 	 */
-	private function check_template_c() {
+	private function check_temp_compile() {
 		//$paht = $this->template_c.
 		$tpl_path = $this->get_tpl_path();
 		$all_tpl_apth = $this->template_c.$tpl_path;
@@ -145,7 +353,7 @@ class template {
 	 * 	@param  string  $path   文件完整路径
 	 *  @return 模板内容
 	 */
-	private function r_file($path) {
+	private function read_file($path) {
 		$r = fopen($path, 'r');
 		$content = fread($r, filesize($path));
 		fclose($r);
@@ -158,15 +366,17 @@ class template {
 	 *  @param  string  $content    模板内容
 	 *  @return 文件名
 	 */
-	private function c_file($filename, $content, $dir) {
-		if(empty($filename)) $this->error("{$filename} Creation failed");
-		$filename = $dir.$filename.$this->tpl_compile_suffix;
-	
-		$fp = fopen($filename, 'wb');
+	private function compile_file($filename, $content, $dir) {
+		if(empty($filename)) core::show_error("{$filename} Creation failed");
+
+		$content = $this->body_content($content);//对文件内容操作
+echo '开始编译了=====';
+		$f = $dir.$filename.$this->tpl_compile_suffix;
+		$fp = fopen($f, 'wb');
 		fwrite($fp, $content, strlen($content));
 		fclose($fp);
 
-		return $filename;
+		return $f;
 	}
 
 	/**
@@ -176,6 +386,7 @@ class template {
 	 *  @return 返回指定行数的字符串 
 	 */
 	private function get_compile_header($filepath, $line = 0) {
+
 		$file_arr = file($filepath);
 		return $file_arr[0];
 	}
