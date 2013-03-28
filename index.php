@@ -22,7 +22,7 @@ if(!($conf = include(SYSTEM_PATH.'conf/config.php'))){
 //项目目录
 define('APP_PATH', './');
 //框架的物理路径
-define('HEART_FRAMEWORK', SYSTEM_PATH.'heartframework0.1/');
+define('HEART_FRAMEWORK', SYSTEM_PATH.'./heartframework0.1/');
 
 include HEART_FRAMEWORK.'base.php';
 app::init();

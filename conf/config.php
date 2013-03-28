@@ -25,13 +25,16 @@ return array(
 	'plugin_path' => array(SYSTEM_PATH.'plugin/'),
 	//静态文件
 	'statics_path' => array(SYSTEM_PATH.'statics/'),
-	'path_info' => 1, //开启pathinfo  {1:开启, 0:关闭}
+	'path_info' => true, //开启pathinfo  {true:开启, false:关闭}
 
 	//配置模板信息
 	'template_config' => array(
 		'template_suffix'    => '.html',
 		'template_path'      => SYSTEM_PATH.'tpl/',
 		'template_c'         => SYSTEM_PATH.'data/template_c/'
-	)
+	),
+
+	//
+	'debug' => array(),
 
 );

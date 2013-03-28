@@ -354,6 +354,8 @@ class template {
 	 *  @return 模板内容
 	 */
 	private function read_file($path) {
+		$this->check_file_limits($path, 'r');
+		
 		$r = fopen($path, 'r');
 		$content = fread($r, filesize($path));
 		fclose($r);
@@ -370,13 +372,31 @@ class template {
 		if(empty($filename)) core::show_error("{$filename} Creation failed");
 
 		$content = $this->body_content($content);//对文件内容操作
-echo '开始编译了=====';
+		echo '开始编译了=====';
 		$f = $dir.$filename.$this->tpl_compile_suffix;
+
+		$this->check_file_limits($f, 'w');
 		$fp = fopen($f, 'wb');
 		fwrite($fp, $content, strlen($content));
 		fclose($fp);
 
 		return $f;
+	}
+
+	/**
+	 * @param  [$path] [路径]
+	 * @param  [status] [w=write, r=read]
+	 */
+	public function check_file_limits($path , $status = 'rw') {
+		if(!is_writable($path) && $status == 'w') {
+			core::show_error("{$path}<br/>没有写入权限，请检查.");
+		} elseif(!is_readable($path) && $status == 'r') {
+			core::show_error("{$path}<br/>没有读取权限，请检查.");
+		} elseif($status == 'rw') {//check wirte and read
+			if(!is_writable($path) || !is_readable($path)) {
+				core::show_error("{$path}<br/>没有写入或读取权限，请检查");
+			}
+		}
 	}
 
 	/**

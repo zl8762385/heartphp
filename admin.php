@@ -15,10 +15,10 @@ define('SYSTEM_PATH', str_replace('\\', '/', substr(__FILE__, 0, -9)));
 if(!($conf = include(SYSTEM_PATH.'conf/config.php'))){
 	echo '全局配置文件不存在，请仔细检查.';
 	exit;
-}
+}	
 
 //项目目录
-define('APP_PATH', './admin/');
+define('APP_PATH', './admin/')	;
 //框架的物理路径
 define('HEART_FRAMEWORK', SYSTEM_PATH.'heartframework0.1/');
 

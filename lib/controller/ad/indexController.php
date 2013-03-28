@@ -14,7 +14,7 @@ class indexController extends helper_baseadminController {
 	public function test() {
 		$list = array('aa', 'bb', 'cc');
 
-
+	
 		$this->view->assign('lists', $list);
 		$this->view->assign('header', '头变量');
 		$this->view->assign('footer', '尾巴变量');

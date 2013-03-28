@@ -24,6 +24,7 @@ class dispatcher {
 
 		$_conf = $conf['path_info'];
 		if($_conf) {//处理PATH_INFO
+
 			dispatcher::pathinfo_handle($get);
 		}
 		$get['c'] = isset($get['c']) && preg_match("/^\w+$/", $get['c']) ? strtolower($get['c']) : 'index' ;
@@ -31,9 +32,12 @@ class dispatcher {
 	}
 
 	/**
-	 * 处理pathinfo
+	 * @param [array] [$get] [$_GET]
+	 * @return 
 	 */
 	static public function pathinfo_handle(&$get){
+		!isset($get['c']) && $get['c'] = 'index';
+		!isset($get['m']) && $get['m'] = 'index';	
 		$pathinfo_uri = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : "/{$get['c']}/{$get['m']}" ;
 
 		$pathinfo = explode('/', $pathinfo_uri);
