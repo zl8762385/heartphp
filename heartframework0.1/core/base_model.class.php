@@ -1,7 +1,7 @@
 <?php
 if(!defined('IS_HEARTPHP')) exit('Access Denied');
 /**
- *  base_controller.class.php   控制器基础类
+ *  base_model.class.php   database model class
  *
  * @copyright			(C) 20013-2015 HeartPHP
  * @author              zhangxiaoliang
@@ -10,13 +10,17 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
  */
 
-class base_controller {
-	protected $view;
-	protected $conf;
-	
+class base_model {
+	protected $conf = '';//database config
+	protected $table_name = '';
+
 	public function __construct() {
 		global $conf;
-		$this->conf = &$conf;
-		$this->view = new template($this->conf);//全局变量传递给template
+		$this->conf = $conf['db'];
+		//echo $this->table_name;
+	}
+
+	public function __call($method, $params){
+		core::show_error("base_mode.class.php : {$method}方法不存在");
 	}
 }

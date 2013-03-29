@@ -1,4 +1,5 @@
 <?php
+if(!defined('IS_HEARTPHP')) exit('Access Denied');
 /**
  *  index.php 助手文件 controller引用中可以extends这个助手
  *

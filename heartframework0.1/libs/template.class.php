@@ -1,4 +1,5 @@
 <?php
+if(!defined('IS_HEARTPHP')) exit('Access Denied');
 /**
  *  template.class.php   模板解析类
  *

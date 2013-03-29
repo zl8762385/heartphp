@@ -10,11 +10,31 @@
  */
 
 return array(
-	'db' => array(),
+	'db' => array(
+		'type' => 'mysql',//数据库类别 默认选中MYSQL 如果想切换其他数据库 请更改TYPE
+		'mysql' => array(
+			'www' => array(
+				'host' => 'localhost',
+				'user' => 'root',
+				'password' => 'v90v70v00',
+				'databse_name' => 'test',
+				'tablepre' => 'heart_',
+				'engine' => 'MyISAM'
+			),
+			'new_database' => array(
+				'host' => 'localhost',
+				'user' => 'root',
+				'password' => 'v90v70v00',
+				'databse_name' => 'test',
+				'tablepre' => 'heart_',
+				'engine' => 'MyISAM'
+			)
+		)
+	),
 	//模板
 	'view_path' => array(SYSTEM_PATH.'tpl/'),
 	//数据模型
-	'model_path' => array(SYSTEM_PATH.'lib/model/'),
+	'model_path' => SYSTEM_PATH.'lib/model/',
 	//控制器
 	'controller_path' => array(SYSTEM_PATH.'lib/controller/'),
 	//助手

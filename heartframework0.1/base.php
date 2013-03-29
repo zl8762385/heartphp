@@ -1,4 +1,5 @@
 <?php
+if(!defined('IS_HEARTPHP')) exit('Access Denied');
 /**
  *  base.php 框架入口文件
  *
@@ -15,13 +16,15 @@ if(!defined('DEBUG')) {
 }
 
 if(DEBUG) {
-	include HEART_FRAMEWORK.'functions/global.func.php';//加载核心的函数库
+
 	include HEART_FRAMEWORK.'core/core.class.php';//一些核心的不太常用的静态方法
+	include HEART_FRAMEWORK.'functions/global.func.php';//加载核心的函数库
 	include HEART_FRAMEWORK.'core/dispatcher.class.php';//路由
 	include HEART_FRAMEWORK.'core/app.class.php';//应用入口 控制各种入口分发
 
 } else {
 	include HEART_FRAMEWORK.'core/core.class.php';
+	include HEART_FRAMEWORK.'functions/global.func.php';//加载核心的函数库
 	include HEART_FRAMEWORK.'core/dispatcher.class.php';
 	include HEART_FRAMEWORK.'core/app.class.php';
 	echo 'not debug status';

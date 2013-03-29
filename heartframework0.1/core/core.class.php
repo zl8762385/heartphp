@@ -1,4 +1,5 @@
 <?php
+if(!defined('IS_HEARTPHP')) exit('Access Denied');
 /**
  *  core.class.php   基础核心类【用来提供各种静态方法】
  *

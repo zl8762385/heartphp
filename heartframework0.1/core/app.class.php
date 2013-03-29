@@ -1,4 +1,5 @@
 <?php
+if(!defined('IS_HEARTPHP')) exit('Access Denied');
 /**
  *  app.class.php  应用类 框架入口
  *

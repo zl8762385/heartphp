@@ -1,4 +1,5 @@
 <?php
+if(!defined('IS_HEARTPHP')) exit('Access Denied');
 /**
  *  dispatcher.class.php   URL映射到控制器【目前仅支持URL？模式和PATHINFO模式】
  *
