@@ -1,0 +1,44 @@
+<{include file="public/header.html"}> 
+
+<div class="col w10">
+         <form>
+            <fieldset>
+              <{if !empty($infos['createtime'])}>
+            <p>
+              <label>创建时间</label>
+                <input type="text" class="text w_15" value="<{echo date('Y-m-d H:i:s', $infos['createtime'])}>" />
+            </p>
+              <{/if}>
+            <p>
+              <label>IP</label>
+                <input type="text" class="text w_15" value="<{echo $infos['ip']}>" />
+            </p>
+            <p>
+              <label>目录</label>
+                <input type="text" class="text w_15" value="<{echo $infos['d']}>" />
+            </p>
+            <p>
+              <label>控制器</label>
+                <input type="text" class="text w_15" value="<{echo $infos['c']}>" />
+            </p>
+            <p>
+              <label>方法</label>
+                <input type="text" class="text w_15" value="<{echo $infos['a']}>" />
+            </p>
+            <{if !empty($infos['referer'])}>
+            <p>
+              <label>REFERER</label>
+                <input type="text" class="text w_15" value="<{echo $infos['referer']}>" />
+            </p>
+            <{/if}>
+            <p>
+              <label>操作信息</label>
+                  <textarea cols="50" rows="5">
+                    <{echo trim($infos['op'])}>
+                  </textarea>
+            </p>       
+            </fieldset>
+            <div class="clear"></div>
+            <!-- End .clear -->
+          </form>
+</div>

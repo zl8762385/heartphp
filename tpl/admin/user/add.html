@@ -1,0 +1,44 @@
+<{include file="public/header.html"}> 
+
+<div class="col w10 margin_top_10 buttons_demo">
+    <a href="<{echo get_url('admin', 'user', 'index')}>" class="button"><span>列表</span></a>
+</div>
+
+<div class="col w10">
+         <form action="<{echo get_url('admin', 'user', 'add')}>" method="post">
+            <fieldset>
+            <!-- Set class to "column-left" or "column-right" on fieldsets to divide the form into columns -->
+           
+            <p>
+              <label>用户名</label>
+                <{echo form::input('data[username]', '')}>
+            </p>
+            <p>
+              <label>密码</label>
+                <{echo form::input('data[password]', '','password')}>
+            </p>
+            <p>
+              <label>确认密码</label>
+                <{echo form::input('data[confirmpassword]', '', 'password')}>
+            </p>
+            <p>
+              <label>Email</label>
+                <{echo form::input('data[email]')}>
+            </p>
+            <p>
+              <label>真实姓名</label>
+                <{echo form::input('data[truename]')}>
+            </p>
+            <p>
+              <label>所属用户组</label>
+                <{echo form::select('data[groupid]', $groupdata)}>
+            </p>       
+
+            <p>
+              <input class="button" type="submit" name="dosubmit" value="提交" />
+            </p>
+            </fieldset>
+            <div class="clear"></div>
+            <!-- End .clear -->
+          </form>
+</div>

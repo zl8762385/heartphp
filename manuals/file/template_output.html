@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>模板输出</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>模板输出</h2>
+    <div class="desc">
+      <p>模板变量赋值后就需要调用模板文件来输出相关变量，模版调用通过display方法来实现，我们在操作方法的最后使用：</p>
+<pre>
+class testController extends base_controller {
+
+  public function index(){
+    $this->view->display();
+  }
+
+  public function zhangliang() {
+    $this->view->display();默认会自动对应/tpl/test/zhangliang.html模板，也可以传入相应模版参数
+  }
+
+}
+</pre>
+      <p>就可以输出模板，因为系统会按照默认规则自动定位模版文件，所以通常display方法无需要带任何参数即可输出对应的模版，这就是模板输出的最简单的方法.</p>
+    </div>
+   <h2>输入变量到模版</h2>
+<pre>
+class testController extends base_controller {
+
+  public function index(){
+    $this->view->display();
+  }
+
+  public function test() {
+    $str = 'string';
+    $array = array('aaa', 'bbb', 'ccc');//数组变量
+
+    $this->view->assign('array', $array);//传递变量到模版
+    $this->view->assign('str', $str);//传递变量到模版
+    $this->view->display();
+  }
+}
+</pre>
+
+  </div>
+</div>
+</body>
+</html>

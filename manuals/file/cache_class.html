@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>缓存类</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>缓存类</h2>
+    <div class="desc">
+      <p>为了方便做了一些简化操作，如果需要设置数据类型 必须把所有参数全部都写全，不然会报错.</p>
+      <div class="longdesc">
+     
+<pre>
+  /**
+   * 设置缓存 默认类型 serialize
+   * @param string $filename      缓存文件名
+   * @param string or array $data 数据
+   * @param string $type          string, serialize
+   * @return 
+   */
+  static public function set($filename, $data, $type = 'serialize') //设置缓存
+
+  /**
+   * 获取缓存 
+   * @param  string $filename 文件名
+   * @param  string $d        目录
+   * @param  string $c        控制器
+   * @param  string $type     类型 默认是 序列化serialize 
+   * @return
+   */
+  static public function get($filename, $d = '', $c = '', $type = 'serialize') //获取缓存
+
+  <span style="color:red;">使用方法有两种：</span>
+  
+  第一种：
+  $data = 我是字符串'';
+  cache::set('zhangliang', $data, 'string');//设置缓存
+  cache::get('zhangliang', '', 'index', 'string');//
+ 
+  第二种：如果不是字符串和其他数据 默认就是序列化存储,可以省略最后一个数据类型参数
+  $data = array('aa' => 'a111', 'bb' => 'a222', 'cc' => '张亮哈哈');
+  cache::set('zhangliang', $data);
+  //完整参数
+  cache::get('zhangliang', '', 'index');
+  //如果您控制器在根目录不是多级目录 可以省略目录的参数 直接写控制器名称即可
+  cache::get('zhangliang', 'index');
+</pre>
+      </div>
+    </div>
+   
+
+  </div>
+</div>
+</body>
+</html>

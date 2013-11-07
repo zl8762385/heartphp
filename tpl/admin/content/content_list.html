@@ -1,0 +1,67 @@
+<{include file="public/header.html"}> 
+<div class="col w10 margin_top_10 buttons_demo">
+  <span class="strong red">当前栏目：<{echo $category['name']}></span></a>
+</div>
+<div class="col w10 margin_top_10 buttons_demo">
+  
+  
+  <a href="<{echo get_url('admin', 'content', 'index')}>" class="button"><span>返回栏目列表</span></a>
+  <a class="button" href="<{echo get_url('admin', 'content', 'add', 'catid='.$category['id'])}>"><small class="icon plus"></small><span>增加内容</span></a>
+</div>
+
+<div class="col w10">
+          <table>
+            <thead>
+              
+              <tr>
+                <th style="width:5%;text-align:center;">ID</th>
+                <{foreach from=$filed_list item=v key=k}>
+                <th><{echo $v['title']}></th>
+                <{/foreach}>
+                <th style="width:10%;">操作</th>
+              </tr>
+              
+            </thead>
+            <tfoot>
+              <tr>
+                <td colspan="6">
+                 
+                  <div class="pagination"> <{echo $pages}> </div>
+                  <!-- End .pagination -->
+                  <div class="clear"></div>
+                </td>
+              </tr>
+            </tfoot>
+            <tbody>
+
+            <{foreach from=$lists item=v key=k}>
+              <tr>
+                <td style="text-align:center;"><{echo $v['id']}></td>
+              
+                <{foreach from=$filed_list item=filed_v key=filed_k}>
+                <td>
+                <{if $filed_v['type'] == 'datetime'}>
+                  <{echo (!empty($v[$filed_v['name']])) ? date('Y-m-d', $v[$filed_v['name']]) : '无' ;}>
+                <{else}>
+                  <{echo $v[$filed_v['name']]}>
+                <{/if}>
+                </td>
+                <{/foreach}>
+                <td>
+
+                  <a href="javascript:_confirm('<{echo get_url('admin', 'content', 'delete', 'id='.$v['id'].'&catid='.$v['catid'].'')}>', '您确认要删除该信息吗?')">删除</a> 
+                  | 
+                  <a href="<{echo get_url('admin', 'content', 'edit', 'id='.$v['id'].'&catid='.$v['catid'].'')}>">修改</a></td>
+              </tr>
+            <{/foreach}>
+            <{if empty($lists)}>
+                <tr>
+                <td colspan="6">
+                  暂无数据
+                </td>
+              </tr>
+            <{/if}>
+            </tbody>
+          </table>
+          
+</div>

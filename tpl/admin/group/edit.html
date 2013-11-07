@@ -1,0 +1,43 @@
+<{include file="public/header.html"}> 
+
+<div class="col w10 margin_top_10 buttons_demo">
+    <a href="<{echo get_url('admin', 'group', 'index')}>" class="button"><span>列表</span></a>
+</div>
+
+<div class="col w10">
+          <form action="<{echo get_url('admin', 'group', 'edit')}>" method="post">
+            <{echo form::input('id', $data['id'], 'hidden')}>
+            <fieldset>
+            <!-- Set class to "column-left" or "column-right" on fieldsets to divide the form into columns -->
+           
+            <p>
+              <label>用户组名称</label>
+                <{echo form::input('data[name]', $data['name'])}>
+            </p>
+            <p>
+              <label>用户组描述</label>
+                <{echo form::textarea('data[description]', $data['description'], '10', '50', 'textarea')}>
+            </p>
+            <p>
+              <label><a href="<{echo get_url('admin', 'group', 'power')}>" rel="facebox">设置用户组权限</a></label>
+                <span action-type="user_group_lists">
+                  <{if $data['group_value'] != ''}>
+                    <{$grouplist = explode(',', $data['group_value']);}>
+                    <{foreach from=$grouplist item=v key=k}>
+                 
+                      <input checked="checked" type="checkbox" value="<{echo $v}>" name="data[group_value][]" /> 
+                      <{echo $menulists[$v]['name']}>
+                    <{/foreach}>
+                  <{/if}>                  
+                </span>
+            </p>
+           
+
+            <p>
+              <input class="button" type="submit" name="dosubmit" value="提交" />
+            </p>
+            </fieldset>
+            <div class="clear"></div>
+            <!-- End .clear -->
+          </form>
+</div>

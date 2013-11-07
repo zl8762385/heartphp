@@ -1,0 +1,39 @@
+<{include file="public/header.html"}> 
+
+<div class="col w10 margin_top_10 buttons_demo">
+    <a href="<{echo get_url('admin', 'category', 'index')}>" class="button"><span>列表</span></a>
+</div>
+
+<div class="col w10">
+          <form action="<{echo get_url('admin', 'category', 'add')}>" method="post">
+            <input type="hidden" name="data[parentid]" value="<{echo $parentid}>">
+            <fieldset>
+            <{if !empty($parentname)}>
+             <p>
+              <label>父级菜单</label>
+                <span class="colorred"><{echo $parentname}></span>
+              </p>
+            <{/if}>
+             <p>
+              <label>模型</label>
+                <{echo form::select('data[modelid]', $model_data)}>
+              </p>
+           
+            <p>
+              <label>名称</label>
+                <{echo form::input('data[name]')}>
+              </p>
+            
+            <p>
+              <label>显示</label>
+              <{echo form::radio('data[is_display]', '1', '1')}>是 <{echo form::radio('data[is_display]', '0')}>否
+            </p>
+
+            <p>
+              <input class="button" type="submit" name="dosubmit" value="提交" />
+            </p>
+            </fieldset>
+            <div class="clear"></div>
+            <!-- End .clear -->
+          </form>
+</div>

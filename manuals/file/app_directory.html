@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>项目目录</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>项目目录</h2>
+    <div class="desc">
+      <p>HeartPHP采用单一入口模式进行项目部署和访问，无论完成什么功能，一个项目都有一个统一（但不一定是唯一）的入口。应该说，所有项目都是从入口文件开始的，并且所有的项目的入口文件是类似的，入口文件中主要包括：</p>
+      <div class="longdesc">
+        <p>1.定义框架路径，项目路径 (必须)</p>
+		<p>2.定义调试模式，系统常量 (必须)</p>
+		<p>3.载入框架入口文件 (必须)</p>
+      </div>
+    </div>
+    <div class="example">
+      <span id="f_ad2"></span>
+      <h2>PHP 代码:</h2>
+	  <div class="longdesc">
+        <p>api - 接口目录</p>
+		<p>application - 项目类库目录，包含controller控制器,model数据模型,hooks钩子,helper工具包</p>
+		<p>conf - 项目配置目录</p>
+		<p>data - 数据目录(包含上传图片/模板缓存/缓存)</p>
+		<p>functions - 用户公用函数</p>
+		<p>heartframework0.2 - 框架核心代码</p>
+		<p>statics - 静态文件，包含css,images,js</p>
+		<p>tpl - 模板目录</p>
+		<p>api.php - 接口文件</p>
+		<p>index.php - 入口文件</p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

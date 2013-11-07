@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>Hooks插件机制</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>Hooks插件机制</h2>
+    <div class="desc">
+   
+<p>hooks插件机制配置 /conf/system.php</p>
+<p>所有的hooks都放入到这个目录下  'path' => SYSTEM_PATH.'application/hooks/'</p>
+<pre>
+	'hooks' => array(
+		//是否开启hooks true or false
+		'enable' => false, //默认关闭了hooks 请更改为true  开启hooks
+		//hooks放置路径
+		'path' => SYSTEM_PATH.'application/hooks/',
+		//hooks挂载配置文件
+		'config' => SYSTEM_PATH.'application/hooks/config/',
+		//hooks后缀，例如：你的钩子名是 users,那么完整的就是 usersHooks.php
+		'class_postfix' => 'Hooks',
+	),
+</pre>
+<h2>hooks挂载配置文件 /application/hooks/config/hook.config.php</h2>
+<p>系统支持3中挂载方式</p>
+<p>plugin:不在系统执行中运行，任意地方调用.</p>
+<p>controller_top:在系统框架中执行，框架运行时在controller运行前执行. </p>
+<p>controller_bottom:在系统框架中执行，框架运行时在controller运行后执行.</p>
+
+
+<pre>
+//插件模式可以在任何地方调用
+$hook['plugin']= array(
+					'arge_users' => array(//arge_users钩子名称
+						array('users', 'func1'),//users-类名 func1-函数
+						array('users', 'func2')//users-类名 func2-函数
+					),
+					'admin_test' => array(
+						array('admin', 'ad1'),
+						array('admin', 'ad2')
+					)
+				);
+//框架运行时在controller运行前执行.
+$hook['controller_top']= array(
+					'arge_users' => array(
+						array('users', 'controller_top'),
+						array('admin', 'ad1')
+					)
+				);
+//框架运行时在controller运行后执行
+$hook['controller_bottom']= array(
+					'arge_users' => array(
+						array('users', 'controller_bottom')
+					)
+				);
+</pre>
+<h2>plugin使用方法</h2>
+<pre>
+	/**
+	 * hooks 静态方法
+	 * @param  string $hooks_name 钩子名
+	 * @param  string $args 参数
+	 * @param  string $type hooks类型 默认插件模式
+	 * @return 
+	 */
+	static public function hooks($hooks_name, $args = '',$type="plugin") {
+
+	$str = '我是参数，这里可以是数组，可以是字符串';
+	core::hooks('arge_users', $str);
+</pre>
+
+<h2>controller_top和controller_bottom 不需要调用，在系统运行时执行Hooks</h2>
+    </div>
+ 
+  </div>
+</div>
+</body>
+</html>

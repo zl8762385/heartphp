@@ -1,0 +1,46 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>模板定义</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>模板定义</h2>
+    <div class="desc">
+      <p>为了对模板文件更加有效的管理，HeartPHP对模板文件进行目录划分，默认的模板文件定义规则是：</p>
+      <p>模板目录默认在跟目录tpl/下.</p>
+      <p>在创建一个控制器是就会指定默认的模版目录，例如：</p>
+      <div class="longdesc">
+<pre>
+//创建一个test控制器
+//控制器路径 controller/testController.php
+class testController extends base_controller {
+
+  public function index(){
+    $this->view->display();
+  }
+
+  public function test() {
+    $this->view->display('test');
+  }
+}
+
+在tpl/目录下创建对应的模版 例如：
+tpl/test/test.html
+</pre>
+      <p>
+        分层控制一般用于读取controller目录下的文件，用于控制器之间相互沟通
+      </p>
+      </div>
+
+    </div>
+   
+
+  </div>
+</div>
+</body>
+</html>

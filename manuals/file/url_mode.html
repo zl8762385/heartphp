@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>URL模式</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>URL模式</h2>
+    <div class="desc">
+      <p>HeartPHP框架基于模块和操作的方式进行访问，由于HeartPHP框架的应用采用单一入口文件来执行，因此网站的所有的模块和操作都通过URL的参数来访问和执行。这样一来，传统方式的文件入口访问会变成由URL的参数来统一解析和调度。</p>
+      <div class="longdesc">
+        <p> 　URL设置：</p>
+		<p>设置路径：conf/config.php</p>
+
+		<p> 　URL参数结构：</p>
+		<p>d: 目录 (可省略，默认是controller跟目录)</p>
+		<p>c: 控制器</p>
+		<p>c: 方法</p>
+      </div>
+    </div>
+    <div class="example" style="margin:0px;">
+      <h2>一、普通模式: 'path_info' => false</h2>
+	　<pre style="font-weight:bold;color:red;font-size:16px;">
+目录模式：
+http://heartphp.com/index.php?d=mulu&c=index&a=test
+
+无目录模式：
+http://heartphp.com/index.php?c=index&a=test
+</pre>
+    </div>
+
+	<div class="example">
+      <h2>一、PATHINFO模式: 'path_info' => true</h2>
+	　<pre style="font-weight:bold;color:red;font-size:16px;">
+目录模式：
+http://heartphp.com/mulu/index/test
+
+无目录模式：
+http://heartphp.com/index/test
+</pre>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

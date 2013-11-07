@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>跨模块访问</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>跨模块访问</h2>
+    <div class="desc">
+      <p>在开发过程中经常会在当前模块调用其他模块的方法，这个时候就涉及到跨模块调用。</p>
+      <div class="longdesc">
+        <p>例如，我们在index模块调用test模块的操作方法：</p>
+		<pre>
+class indexController extends base_controller {
+
+	public function test(){
+		$test = new testController();//在调用的时候类名必须为 Controller 开头字母大写
+		$test->index();
+	}
+
+}
+
+class testController extends base_controller {
+
+	public function index(){
+		echo '我是testController模块';
+	}
+}
+		</pre>
+
+      </div>
+    </div>
+   
+
+  </div>
+</div>
+</body>
+</html>

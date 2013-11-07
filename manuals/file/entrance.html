@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>入口文件</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>入口文件</h2>
+    <div class="desc">
+      <p>HeartPHP采用单一入口模式进行项目部署和访问，无论完成什么功能，一个项目都有一个统一（但不一定是唯一）的入口。应该说，所有项目都是从入口文件开始的，并且所有的项目的入口文件是类似的，入口文件中主要包括：</p>
+      <div class="longdesc">
+        <p>1.定义框架路径，项目路径 (必须)</p>
+		<p>2.定义调试模式，系统常量 (必须)</p>
+		<p>3.载入框架入口文件 (必须)</p>
+      </div>
+    </div>
+    <div class="example">
+      <span id="f_ad2"></span>
+      <h4>PHP 代码:</h4>
+      <pre><code>
+&lt;?php
+	define('HEARTPHP_KEY', '!@#%&GGRE$%^&*()OLKJHGT');//默认密钥 用于加密
+	define('IS_HEARTPHP', TRUE);
+	define('DEBUG', 1);//开启DEBUG模式  模板引擎会一直处于编译状态，建议上线后DEBUG改成0
+	define('SYSTEM_PATH', str_replace('\\', '/', substr(__FILE__, 0, -9)));
+
+	if(!($conf = include(SYSTEM_PATH.'conf/system.php'))){
+		echo '全局配置文件不存在，请仔细检查.';
+		exit;
+	}
+
+	define('APP_PATH', './');//项目目录
+	define('HEART_FRAMEWORK', SYSTEM_PATH.'./heartframework0.1/');//框架的物理路径
+	//加载框架入口文件
+	include HEART_FRAMEWORK.'base.php';
+	app::init();
+	app::run();
+?&gt
+		</code></pre>
+     
+    </div>
+  </div>
+</div>
+</body>
+</html>

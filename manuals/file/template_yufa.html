@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>模板语法</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>模板语法</h2>
+    <div class="desc">
+      <p>下面是常用的模版语法，如果需要什么语法 还不想自己增加，可以联系我，我会在系统核心框架中开发出来. 我QQ：979314</p>
+<pre>
+//可以在项目跟目录 functions/global.func.php 定义函数，可以直接在模版中使用.
+//foreach  $lists 数组
+<{foreach from=$lists item=v key=k}>
+  <{echo $v['name']}>
+  <{echo $k}>
+<{/foreach}>
+
+
+//调用模版文件
+<{include file="public/header.html"}> 
+
+//模板中使用函数
+<{echo GetIP();}>
+
+<{if $a == 'aa'}>
+  只是IF判断
+<{/if}>
+
+
+<{if !empty($a)}>
+  结合PHP函数判断
+<{/if}>
+
+<{if $a == 'bb'}>
+  模板语法 if else bbb
+<{else}>
+  模板语法 if else aaa 
+<{/if}>
+
+<{if $a == 'bb'}>
+  模板语法 if elseif bbbb
+<{elseif $a == 'aa'}>
+  模板语法 if elseif aaa
+<{/if}>
+
+<{if $a == 'bb'}>
+  模板语法 if elseif else bbb
+<{elseif $a == 'cc'}>
+  模板语法 if elseif else aaa
+<{else}>
+  模板语法 if elseif else else aaa
+<{/if}>
+</pre>
+    </div>
+ 
+  </div>
+</div>
+</body>
+</html>

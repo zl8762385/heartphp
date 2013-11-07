@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+<title>多层控制器支持</title>
+<link type="text/css" rel="stylesheet" href="../style/style.css"  />
+</head>
+<body id="split">
+<div id="content">
+  
+  <div rel="size">
+    <h2>多层控制器支持</h2>
+    <div class="desc">
+      <p>单函数方法获取多层控制器对象。</p>
+      <p>多层控制器  /libs/controller/读取这下面的文件</p>
+      <div class="longdesc">
+<pre>
+//该实例读取路径是 /libs/controller/login/usersController.php读取这下面的文件
+//users 文件名称，相当于usersController.php
+//login 目录名
+$users = C('users', 'login');
+$users->test();
+
+//该实例读取路径是 /libs/controller/usersController.php读取这下面的文件
+$users = C('users');
+$users->test();
+</pre>
+      <p>
+        分层控制一般用于读取controller目录下的文件，用于控制器之间相互沟通
+      </p>
+      </div>
+
+    </div>
+   
+
+  </div>
+</div>
+</body>
+</html>

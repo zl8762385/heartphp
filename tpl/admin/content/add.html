@@ -1,0 +1,31 @@
+<{include file="public/header.html"}> 
+<div class="col w10 margin_top_10 buttons_demo">
+  <span class="strong red">当前栏目：<{echo $category['name']}></span></a>
+</div>
+
+<div class="col w10 margin_top_10 buttons_demo">
+    <a href="<{echo get_url('admin', 'content', 'content_list', 'catid='.$category['id'])}>" class="button"><span>返回内容列表</span></a>
+</div>
+
+<div class="col w10">
+          <form id="form1" action="<{echo get_url('admin', 'content', 'add')}>" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="data[catid]" value="<{echo $category['id']}>">
+             <input type="hidden" name="data[modelid]" value="<{echo $category['modelid']}>">
+            <fieldset>
+            <{foreach from=$form_data item=v key=k}>
+            <p>
+              <label><{echo $v['name']}></label>
+              <{echo $v['input']}>
+            </p>
+            <{/foreach}>
+            <p>
+              <{if !empty($form_data)}>
+                  <input class="button" type="submit" name="dosubmit" value="提交" />
+                  <input class="button" type="submit" name="dosubmit" value="提交并继续发表" />
+              <{/if}>
+              
+            </p>
+            </fieldset>
+            <div class="clear"></div>
+          </form>
+</div>
