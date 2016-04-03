@@ -1,0 +1,39 @@
+<{include file="public/header.html"}> 
+<style type="text/css">
+  .select2{width:100px;height:35px;font-size: 14px;}
+</style>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    <li><a href="<{echo get_url('admin', 'category', 'index')}>">栏目列表</a></li>
+    <li><a href="">修改栏目</a></li>
+    </ul>
+</div>
+
+<div class="formbody">
+    
+    <div class="formtitle"><span>基本信息</span></div>
+<form action="<{echo get_url('admin', 'category', 'edit')}>" method="post">
+<input type="hidden" name="id" value="<{$edit_data['id']}>">
+<{echo get_token_input()}>
+    <ul class="forminfo">
+      <!-- <li><label>文章标题</label><input name="" type="text" class="dfinput" /><i>标题不能超过30个字符</i></li> -->
+      <{if !empty($parentname)}>
+        <li><label>父级菜单</label><input type="text" value="<{$parentname}>" readonly disabled class="dfinput"></li>
+      <{/if}>
+      <li><label>模型</label><{echo form::select('data[modelid]', $model_data, $edit_data[modelid])}></li>
+      <li><label>名称</label> <{echo form::input('data[name]', $edit_data[name])}></li>
+      <li><label>简介</label>
+    <{echo form::textarea('data[description]', $edit_data[description],10,50, 'textinput')}>
+      </li>
+      <li><label>栏目图片</label><{$images = json_decode($edit_data[images],1)}>
+                <{echo form::uploadfile('images', 'images', 'images', $images)}></li>
+      <li><label>显示</label><cite>
+      <{echo form::radio('data[is_display]', '1', $edit_data[is_display])}>是 &nbsp;&nbsp;<{echo form::radio('data[is_display]', '0', $edit_data[is_display])}>否
+      </cite></li>
+      <li><label>&nbsp;</label><input name="dosubmit" type="submit" class="btn" value="确认保存"/></li>
+    </ul>
+</form>    
+</div>
+

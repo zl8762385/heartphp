@@ -1,0 +1,90 @@
+<{include file="public/header.html"}> 
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+</script>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    <li><a href="<{echo get_url('admin', 'content', 'index')}>">栏目列表</a></li>
+    <li><a href="">内容列表</a></li>
+    </ul>
+</div>
+
+
+<div class="rightinfo">
+
+    <div class="tools">
+    
+      <ul class="toolbar">
+        <li class="click">
+            <a href="<{echo get_url('admin', 'content', 'add', 'catid='.$category['id'])}>"><span><img src="<{echo $config['static_path_images']}>new_admin/t01.png" /></span>添加内容</a>
+        </li>
+    
+        </ul>
+        
+        
+        <!-- <ul class="toolbar1">
+        <li><span><img src="<{echo $config['static_path_images']}>new_admin/t05.png" /></span>设置</li>
+        </ul> -->
+    
+    </div>
+
+  <div style="height:35px; line-height:35px;font-weight:800;">
+    <span class="strong red">当前栏目：<{echo $category['name']}></span></a>
+  </div>
+
+          <table class="tablelist">
+            <thead>
+              
+              <tr>
+                <th style="width:5%;text-align:center;">ID</th>
+                <{foreach from=$filed_list item=v key=k}>
+                <th><{$v['title']}></th>
+                <{/foreach}>
+                <th style="width:15%;">操作</th>
+              </tr>
+
+            </thead>
+            
+            <tbody>
+
+            <{foreach from=$lists item=v key=k}>
+              <tr>
+                <td style="text-align:center;"><{$v['id']}></td>
+              
+                <{foreach from=$filed_list item=filed_v key=filed_k}>
+                <td>
+                <{if $filed_v['type'] == 'datetime'}>
+                  <{echo (!empty($v[$filed_v['name']])) ? date('Y-m-d', $v[$filed_v['name']]) : '无' ;}>
+                <{elseif $filed_v['type'] == 'box'}>
+                    <{echo box_explode($v[$filed_v['name']], $filed_v['settings'])}>
+                <{else}>
+                  <{$v[$filed_v['name']]}>
+                <{/if}>
+                </td>
+                <{/foreach}>
+                <td>
+
+                  <a href="<{echo get_url('admin', 'content', 'edit', 'id='.$v['id'].'&catid='.$v['catid'].'')}>"><{echo icons('edit', '修改')}></a> 
+                    &nbsp;
+                  <a href="javascript:_confirm('<{echo get_url('admin', 'content', 'delete', 'id='.$v['id'].'&catid='.$v['catid'].'')}>', '您确认要删除该信息吗?')"><{echo icons('delete', '删除')}></a>
+                  </td>
+              </tr>
+            <{/foreach}>
+            <{if empty($lists)}>
+                <tr>
+                <td colspan="6">
+                  暂无数据
+                </td>
+              </tr>
+            <{/if}>
+            </tbody>
+          </table>
+          
+</div>
+
+<div class="pagin">
+  <div class="pagination"> <{$pages}> </div>
+</div>

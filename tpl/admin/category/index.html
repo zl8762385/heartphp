@@ -1,0 +1,83 @@
+<{include file="public/header.html"}> 
+<style type="text/css">
+  .select2{width:100px;height:35px;font-size: 14px;}
+</style>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    <li><a href="<{echo get_url('admin', 'category', 'index')}>">栏目列表</a></li>
+    </ul>
+</div>
+
+<div class="rightinfo">
+
+    <div class="tools">
+    
+      <ul class="toolbar">
+        <li class="click">
+            <a href="<{echo get_url('admin', 'category', 'add')}>"><span><img src="<{echo $config['static_path_images']}>new_admin/t01.png" /></span>添加栏目</a>
+        </li>
+    
+        </ul>
+        
+        
+        <!-- <ul class="toolbar1">
+        <li><span><img src="<{echo $config['static_path_images']}>new_admin/t05.png" /></span>设置</li>
+        </ul> -->
+    
+    </div>
+
+
+          
+      <form action="<{echo get_url('admin', 'category', 'action')}>" method="post">
+          <{echo get_token_input()}>
+          <table class="tablelist">
+            <thead>
+              <tr>
+                <th style="width:50px;">排序<!--<input class="check-all" type="checkbox" />--></th>
+                <th>ID</th>
+                <th>名称</th>
+                <th>显示状态</th>
+                <th>创建时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tfoot>
+              <tr>
+                <td colspan="6">
+                  
+                  <div style="margin:3px 0 0 10px">
+                    <select name="actions_switch" class="system_select" style="float:left;margin:10px 0 0 0;width:80px;">
+                      <option value="0">选择...</option>
+                      <option value="orders">排序</option>
+                      <!--<option value="delete">删除</option>-->
+                    </select>
+                    <input type="submit" value="应用" name="dosubmit" class="system_btn" style="margin:10px 0 0 0;"> 
+                  </div>
+                  
+                </td>
+              </tr>
+            </tfoot>
+            <tbody>
+              <{echo $categorys}>
+              <!--
+              <tr>
+                <td><{echo $v['id']}></td>
+                <td><{echo $v['name']}></td>
+                <td><{echo date('Y-m-d H:i:s', $v['createtime'])}></td>
+                <td>
+                  <a href="#" title="">查看子菜单</a> 
+                  <a href="#" title="">修改</a> 
+                  <a href="javascript:_confirm('<{echo get_url('admin', 'menu', 'delete', '?id='.$v['id'].'')}>', '您确认要删除该信息吗?')" title="">删除</a>
+                </td>
+              </tr>
+            -->
+            </tbody>
+          </table>
+        </form>
+</div>
+
+<div class="pagin">
+  <div class="pagination"> <{echo $pages}> </div>
+</div>
