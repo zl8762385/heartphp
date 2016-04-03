@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * 后台管理系统 网站模型_字段s
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang <zl8762385@163.com> <qq:979314>
+ * @author              zhangxiaoliang <zl8762385@163.com> <qq:3677989>
  * @lastmodify			2013.04.07
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -19,11 +19,11 @@ class sitemodel_fieldController extends helper_baseadminController {
 	 * 字段设置
 	 */
 	public function field_settings() {
-		$filedtype = core::gpc('filedtype');
+		$filedtype = gpc('filedtype');
 		$filedtype_func = (empty($filedtype)) ? $this->show_message('请求错误!') : $filedtype.'_settings' ;
 
 		$this->db_filed = D('model_filed_model');
-		$this->filed_id = core::gpc('id');//模型ID
+		$this->filed_id = gpc('id');//模型ID
 		$this->read_fieldinfo = $this->get_field_settings();//更新字段设置，从数据库模型中读取.
 	
 		$this->$filedtype_func();
@@ -36,7 +36,7 @@ class sitemodel_fieldController extends helper_baseadminController {
 		if(empty($this->filed_id)) return false;
 		$filed_info = $this->db_filed->get_one($this->filed_id);
 
-		if(isset($filed_info['settings'])) $filed_info['settings'] = string2array($filed_info['settings']);
+		if(isset($filed_info['settings'])) $filed_info['settings'] = json_decode($filed_info['settings'],1);
 		return $filed_info;
 	}
 
@@ -80,10 +80,10 @@ EOF;
 
 		//html
 		$data['settings'] =<<<EOF
-			<p>字段长度:{$size}</p>
-			<p>样式:{$text_style}</p>
-			<p>默认值:{$default_value}</p>
-			<p>是否为密码框:是{$is_pwd_yes} 否{$is_pwd_no}</p>
+			<p><span>字段长度：</span>{$size}</p>
+			<p><span>样式：</span>{$text_style}</p>
+			<p><span>默认值：</span>{$default_value}</p>
+			<p><span>是否为密码框：</span>{$is_pwd_yes} &nbsp;是 {$is_pwd_no} &nbsp;否</p> 
 EOF;
 		
 		$data['settings'] = str_replace('#filed_html#', $data['settings'], $this->template_html());
@@ -108,9 +108,9 @@ EOF;
 		$height = form::input('settings[height]', $r_height);
 		//html
 		$data['settings'] =<<<EOF
-			<p>高度:{$height}</p>
-			<p>宽度:{$width}</p>
-			<p>默认值:{$default_value}</p>
+			<p><span>高度：</span>{$height}</p>
+			<p><span>宽度：</span>{$width}</p>
+			<p><span>默认值：</span>{$default_value}</p>
 EOF;
 		
 		$data['settings'] = str_replace('#filed_html#', $data['settings'], $this->template_html());
@@ -134,8 +134,8 @@ EOF;
 		$height = form::input('settings[height]', $r_height);
 		//html
 		$data['settings'] =<<<EOF
-			<p>高度:{$height}</p>
-			<p>宽度:{$width}</p>
+			<p><span>高度：</span>{$height}</p>
+			<p><span>宽度：</span>{$width}</p>
 EOF;
 		
 		$data['settings'] = str_replace('#filed_html#', $data['settings'], $this->template_html());
@@ -157,7 +157,7 @@ EOF;
 
 		//生成文本框
 		$filed_default_value = form::input('settings[filed_default_value]', $r_filed_default_value);
-		$box = form::textarea('settings[box]', $r_box, '', '', '', 'width:150px;height:150px;');
+		$box = form::textarea('settings[box]', $r_box, '', '', 'textinput', 'width:150px;height:150px;');
 		$radio = form::radio('settings[boxtype]', 'radio', $r_boxtype);
 		$checkbox = form::radio('settings[boxtype]', 'checkbox', $r_boxtype);
 		$select = form::radio('settings[boxtype]', 'select', $r_boxtype);
@@ -173,12 +173,12 @@ EOF;
 		$filedtype = form::select('settings[filedtype]', $filedtype, $r_filedtype);
 		//html
 		$data['settings'] =<<<EOF
-		<table style="width:700px;">
+		<table class="system_param_select">
 			<tr>
-				<td style="vertical-align:middle;width:60px;">选项列表</td>
+				<td style="vertical-align:middle;width:100px;text-align:right">选项列表：</td>
 				<td style="width:560px;">{$box}</td>
 			</tr>
-			<tr>
+			<tr style="height:55px;">
 				<td></td>
 				<td>
 				 {$radio}单选按钮 
@@ -187,12 +187,12 @@ EOF;
 				 <!--{$multiple}多选列表框-->
 				</td>
 			</tr>
-			<tr>
-				<td>字段类型</td>
+			<tr style="height:55px;">
+				<td style="text-align:right;">字段类型：</td>
 				<td>{$filedtype}</td>
 			</tr>
-			<tr>
-				<td>默认值</td>
+			<tr style="height:55px;">
+				<td style="text-align:right;">默认值：</td>
 				<td>{$filed_default_value}</td>
 			</tr>
 		</table>
@@ -207,8 +207,8 @@ EOF;
 	public function template_html() {
 		$html =<<<EOF
 		<p>
-            <label class="colorred">相关参数设置 <span style="color:#ccc;font-size:10px;">设置表单相关属性</span></label>
-            <div style="margin:0 0 0 30px">
+            <label class="colorred">相关参数设置</label>
+            <div class="param_settings">
               #filed_html#
             </div>
         </p>

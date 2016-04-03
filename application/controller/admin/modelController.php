@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * 后台管理系统 model 模型管理
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.22
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -16,7 +16,7 @@ class modelController extends helper_baseadminController {
 		$this->db = D('admin_model_model');
 		$this->db_filed = D('model_filed_model');
 		$this->pagesize = 20;
-		$filed_type = core::load_config('filed_config');//获取字段配置文件
+		$filed_type = C('', 'filed_config');//获取字段配置文件
 		$this->filed_settings_config = $filed_type['filed_type'];//字段配置文件 类型，大小
 		$this->select_type_config = $filed_type['select_type'];//字段选择类型
 		$this->check_pattern = $filed_type['check_pattern'];//验证 正则
@@ -26,7 +26,7 @@ class modelController extends helper_baseadminController {
 	 * 字段列表
 	 */
 	public function filed() {
-		$m_id = core::gpc('id');
+		$m_id = gpc('id');
 		
 		$lists = $this->db_filed->select('*', 'm_id='.$m_id, '', 'orders asc');
 		$this->view->assign('filed_type', $this->select_type_config);
@@ -39,15 +39,15 @@ class modelController extends helper_baseadminController {
 	 * 添加字段
 	 */
 	public function add_filed() {
-		$id = core::gpc('id');
+		$id = gpc('id');
 		$model_info = $this->db->get_one($id);
 	
-		if(core::gpc('dosubmit', 'R')){
+		if(gpc('dosubmit', 'R')){
 			
 			
-			$data = core::gpc('data', 'P');
-			$settings = core::gpc('settings', 'R');
-			$m_id = core::gpc('m_id', 'R');
+			$data = gpc('data', 'P');
+			$settings = gpc('settings', 'R');
+			$m_id = gpc('m_id', 'R');
 			$m_data = $this->db->get_one($m_id);
 
 			$this->comm_check_data('_empty', $data['title'], '请输入标题.');
@@ -57,8 +57,8 @@ class modelController extends helper_baseadminController {
 			//$this->comm_check_data('_empty', $data['verify_column'], '', '0');
 			$this->comm_check_data('_empty', $data['description'], '', '0');
 
-			if(!empty($settings)) $data['settings'] = array2string($settings);
-			if(!empty($data['number_range'])) $data['number_range'] = array2string($data['number_range']);
+			if(!empty($settings)) $data['settings'] = json_encode($settings);
+			if(!empty($data['number_range'])) $data['number_range'] = json_encode($data['number_range']);
 			
 			$data['m_id'] = $m_id;
 
@@ -117,12 +117,12 @@ class modelController extends helper_baseadminController {
 	 * @return
 	 */
 	public function edit_filed() {
-		if(core::gpc('dosubmit', 'R')){
+		if(gpc('dosubmit', 'R')){
 			
-			$data = core::gpc('data', 'P');
-			$filed_id = core::gpc('filed_id', 'P');
-			$m_id = core::gpc('m_id', 'P');
-			$settings = core::gpc('settings', 'P');
+			$data = gpc('data', 'P');
+			$filed_id = gpc('filed_id', 'P');
+			$m_id = gpc('m_id', 'P');
+			$settings = gpc('settings', 'P');
 			$model_data = $this->db->get_one($m_id);
 
 			$this->comm_check_data('_empty', $data['name'], '请输入标题.');
@@ -157,8 +157,8 @@ class modelController extends helper_baseadminController {
 			$update = array();
 			$update = $data;//将修改数据放入 原键值中.
 			unset($update['source_name']);
-			if(!empty($settings)) $update['settings'] = array2string($settings);
-			if(!empty($data['number_range'])) $update['number_range'] = array2string($data['number_range']);
+			if(!empty($settings)) $update['settings'] = json_encode($settings);
+			if(!empty($data['number_range'])) $update['number_range'] = json_encode($data['number_range']);
 			
 			if($this->db_filed->update($update, 'id='.$filed_id)) {
 				$filed_type = $this->filed_settings_config[$data['type']]['type'];
@@ -195,7 +195,7 @@ class modelController extends helper_baseadminController {
 			}
 		}
 
-		$id = core::gpc('id');
+		$id = gpc('id');
 		$filed_info = $this->db_filed->get_one($id);//获取字段信息
 		$model_info = $this->db->get_one($filed_info['m_id']);//获取模型信息
 
@@ -213,7 +213,7 @@ class modelController extends helper_baseadminController {
 	 * 删除字段
 	 */
 	public function del_filed() {
-		$id = core::gpc('id');
+		$id = gpc('id');
 		$this->comm_check_data('_empty', $id, '错误信息.');
 
 		$filed_info = $this->db_filed->get_one($id);
@@ -231,11 +231,11 @@ class modelController extends helper_baseadminController {
 	 * 应用操作
 	 */
 	public function filed_action() {
-		$actions_switch = core::gpc('actions_switch', 'R');
-		$m_id = core::gpc('m_id', 'R');
+		$actions_switch = gpc('actions_switch', 'R');
+		$m_id = gpc('m_id', 'R');
 		switch($actions_switch) {
 			case 'orders':
-				$orders = core::gpc('orders', 'P');
+				$orders = gpc('orders', 'P');
 				if(empty($orders)) $orders = array();
 
 				foreach($orders as $k => $v) {
@@ -245,7 +245,7 @@ class modelController extends helper_baseadminController {
 				$this->show_message('操作成功!', '', get_url('admin', 'model', 'filed', 'id='.$m_id));
 			break;
 			case 'content_list':
-				$content_list = core::gpc('content_list', 'P');
+				$content_list = gpc('content_list', 'P');
 				if(empty($content_list)) $content_list = array();
 
 				foreach($content_list as $k => $v) {
@@ -277,7 +277,7 @@ class modelController extends helper_baseadminController {
 	 * 模型列表
 	 */
 	public function index() {
-		$page = core::gpc('p');
+		$page = gpc('p');
 		list($count, $lists) = $this->db->select_all('*', 'status=1', '', '', $page, $this->pagesize);
 
 		//print_r($lists);
@@ -291,8 +291,8 @@ class modelController extends helper_baseadminController {
 	 * add model
 	 */
 	public function add () {
-		if(core::gpc('dosubmit', 'P')) {
-			$data = core::gpc('data', 'P');
+		if(gpc('dosubmit', 'P')) {
+			$data = gpc('data', 'P');
 
 			$this->comm_check_data('_empty', $data['name'], '请输入模型名称.');
 			$this->comm_check_data('_empty', $data['table_name'], '请输入数据表名.');
@@ -315,9 +315,9 @@ class modelController extends helper_baseadminController {
 	 * edit model
 	 */
 	public function edit() {
-		if(core::gpc('dosubmit', 'P')) {
-			$id = core::gpc('modelid', 'R');
-			$data = core::gpc('data', 'P');
+		if(gpc('dosubmit', 'P')) {
+			$id = gpc('modelid', 'R');
+			$data = gpc('data', 'P');
 
 			$this->comm_check_data('_empty', $data['name'], '请输入模型名称.');
 			$this->comm_check_data('_empty', $data['table_name'], '请输入数据表名.');
@@ -341,7 +341,7 @@ class modelController extends helper_baseadminController {
 			}
 		}
 
-		$id = core::gpc('id');
+		$id = gpc('id');
 		$data = $this->db->get_one($id);
 
 		$this->view->assign('data', $data);
@@ -351,7 +351,7 @@ class modelController extends helper_baseadminController {
 	 * delete model
 	 */
 	public function delete() {
-		$id = intval(core::gpc('id', 'R'));
+		$id = intval(gpc('id', 'R'));
 		$rt = $this->db->update(array('status' => '-1'),'id='.$id);
 		if($rt) {
 			//删除模型只是修改状态，并且不删除表，以免误操作 数据丢失，请见谅

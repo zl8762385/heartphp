@@ -1,12 +1,36 @@
 <{include file="public/header.html"}> 
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+</script>
 
-<div class="col w10 margin_top_10 buttons_demo">
-    <a href="<{echo get_url('admin', 'menu', 'index')}>" class="button"><span>列表</span></a>
-    <a class="button" href="<{echo get_url('admin', 'menu', 'add')}>"><small class="icon plus"></small><span>增加菜单</span></a>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    <li><a href="<{echo get_url('admin', 'menu', 'index')}>">后台菜单列表</a></li>
+    </ul>
 </div>
 
-<div class="col w10">
-    <table>
+<div class="rightinfo">
+
+    <div class="tools">
+    
+      <ul class="toolbar">
+        <li class="click">
+            <a href="<{echo get_url('admin', 'menu', 'add')}>"><span><img src="<{echo $config['static_path_images']}>new_admin/t01.png" /></span>添加菜单</a>
+        </li>
+    
+        </ul>
+        
+        
+        <!-- <ul class="toolbar1">
+        <li><span><img src="<{echo $config['static_path_images']}>new_admin/t05.png" /></span>设置</li>
+        </ul> -->
+    
+    </div>
+
+
+          <table class="tablelist">
             <thead>
               <tr>
                 <!--
@@ -20,24 +44,7 @@
                 <th>操作</th>
               </tr>
             </thead>
-            <tfoot>
-              <tr>
-                <td colspan="6">
-                  <!--
-                  <div class="bulk-actions align-left">
-                    <select name="dropdown">
-                      <option value="0">选择...</option>
-                      <option value="edit">更改</option>
-                      <option value="delete">删除</option>
-                    </select>
-                    <a class="button" href="#">应用</a> </div>
-                  -->
-                  <div class="pagination"> <{echo $pages}> </div>
-                  <!-- End .pagination -->
-                  <div class="clear"></div>
-                </td>
-              </tr>
-            </tfoot>
+
             <tbody>
               <{echo $categorys}>
               <!--
@@ -53,4 +60,8 @@
               </tr>-->
             </tbody>
     </table>
+</div>
+
+<div class="pagin">
+  <div class="pagination"> <{echo $pages}> </div>
 </div>

@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * 后台管理系统 菜单
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang <zl8762385@163.com> <qq:979314>
+ * @author              zhangxiaoliang <zl8762385@163.com> <qq:3677989>
  * @lastmodify			2013.04.09
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -19,7 +19,7 @@ class menuController extends helper_baseadminController {
 
 	//lists
 	public function index() {
-		$page = core::gpc('p');
+		$page = gpc('p');
 		$tree = new tree();
 		$tree->icon = array('&nbsp;&nbsp;&nbsp;│ ','&nbsp;&nbsp;&nbsp;├─ ','&nbsp;&nbsp;&nbsp;└─ ');
 		$tree->nbsp = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -29,7 +29,7 @@ class menuController extends helper_baseadminController {
 
 		foreach($data as $r) {
 			$r['create_date'] = date('Y-m-d H:i:s', $r['createtime']);
-			$r['str_manage'] = '<a href="'.get_url('admin', 'menu', 'add', 'id='.$r['id'].'').'" title="">添加子菜单</a>&nbsp;&nbsp;<a href="'.get_url('admin', 'menu', 'edit', 'id='.$r['id'].'').'" title="">修改</a>&nbsp;&nbsp;<a href="javascript:_confirm(\''.get_url('admin', 'menu', 'delete', 'id='.$r['id'].'').'\', \'您确认要删除该信息吗?\')" title="">删除</a>';
+			$r['str_manage'] = '<a href="'.get_url('admin', 'menu', 'add', 'id='.$r['id'].'').'" title="">'.icons('add', '添加子菜单').'</a>&nbsp;&nbsp;<a href="'.get_url('admin', 'menu', 'edit', 'id='.$r['id'].'').'" title="">'.icons('edit', '修改').'</a>&nbsp;&nbsp;<a href="javascript:_confirm(\''.get_url('admin', 'menu', 'delete', 'id='.$r['id'].'').'\', \'您确认要删除该信息吗?\')" title="">'.icons('delete', '删除').'</a>';
 			$r['parentid_node'] = ($r['parentid'])? ' class="child-of-node-'.$r['parentid'].'"' : '';
 			$array[] = $r;
 		}
@@ -50,11 +50,11 @@ class menuController extends helper_baseadminController {
 
 	//add
 	public function add() {
-		$id = core::gpc('id');
+		$id = gpc('id');
 		$data = $this->db->get_one($id);
 
-		if(core::gpc('dosubmit_add', 'R')) {//add menu
-			$data = core::gpc('data', 'R');
+		if(gpc('dosubmit_add', 'R')) {//add menu
+			$data = gpc('data', 'R');
 			empty($data['name']) && $this->show_message('请输入名称');
 
 			empty($data['controller']) && $this->show_message('请输入文件名');
@@ -77,10 +77,10 @@ class menuController extends helper_baseadminController {
 
 	//edit
 	public function edit() {
-		$id = core::gpc('id', 'R');	
+		$id = gpc('id', 'R');
 		empty($id) && $this->show_message('请输入ID.', '', get_url('admin', 'menu', 'index'));
-		if(core::gpc('dosubmit', 'P')){
-			$data =  core::gpc('data', 'R');
+		if(gpc('dosubmit', 'P')){
+			$data =  gpc('data', 'R');
 
 			$rt = $this->db->update($data, 'id='.$id);
 			$rt && $this->show_message('数据修改成功.', '', get_url('admin', 'menu', 'index'));
@@ -94,7 +94,7 @@ class menuController extends helper_baseadminController {
 
 	//delete
 	public function delete() {
-		$id = intval(core::gpc('id'));
+		$id = intval(gpc('id'));
 		$rt = $this->db->delete('id='.$id);
 		if($rt) {
 			$rts = $this->db->delete('parentid='.$id);//删除子栏目

@@ -1,11 +1,20 @@
 <{include file="public/header.html"}> 
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+</script>
 
-<div class="col w10 margin_top_10 buttons_demo">
-    <a href="<{echo get_url('admin', 'log', 'index')}>" class="button"><span>日志管理</span></a>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    <li><a href="<{echo get_url('admin', 'log', 'index')}>">日志列表</a></li>
+    </ul>
 </div>
 
-<div class="col w10">
-         <table>
+
+<div class="rightinfo">
+
+        <table class="tablelist">
             <thead>
               <tr>
                 <th>ID</th>
@@ -18,24 +27,20 @@
                 <th>操作</th>
               </tr>
             </thead>
-            <tfoot>
-              <tr>
-                <td colspan="8">
-                 
-                  <div class="pagination"> <{echo $pages}> </div>
-                  <!-- End .pagination -->
-                  <div class="clear"></div>
-                </td>
-              </tr>
-            </tfoot>
+        
             <tbody>
             <{foreach from=$lists item=v key=k}>
               <tr>
-                <td><{echo $v['id']}></td>
-                <td><{echo $v['ip']}></td>
-                <td><{echo $v['d']}></td>
-                <td><{echo $v['c']}></td>
-                <td><{echo $v['a']}></td>
+                <td><{$v['id']}></td>
+                <td><{$v['ip']}></td>
+                <td><{$v['d']}></td>
+                <td><{$v['c']}></td>
+                <td><{$v['a']}>
+                <{if $v['a'] == 'check_login'}>
+                  <font class="red">登陆</font>
+                <{/if}>
+                </td>
+
                 <td>
                   <{if empty($v['createtime'])}>
                     无
@@ -47,16 +52,21 @@
                   <{$op = string2array($v['op'])}>
                   <{if empty($op['username'])}>
                     无
+                  <{elseif $v['a'] == 'check_login'}>
+                    登陆日志
                   <{else}>
                     <{echo $op['username']}> [<span style="color:red"><{echo $op['userid']}></span>]
                   <{/if}>
                   
                 </td>
                 <td>
-                  <a href="<{echo get_url('admin', 'log', 'details', 'id='.$v['id'].'')}>">详细</a>
+                  <a href="<{echo get_url('admin', 'log', 'details', 'id='.$v['id'].'')}>"><{echo icons('detail', '详细')}></a>
                 </td>
               </tr>
             <{/foreach}>
             </tbody>
           </table>
+</div>
+<div class="pagin">
+  <div class="pagination"> <{echo $pages}> </div>
 </div>

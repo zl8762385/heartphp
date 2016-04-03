@@ -3,7 +3,7 @@
  *  upload.class.php  上传文件
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -57,7 +57,7 @@ class upload {
       
     //构造函数       
     //$types : 允许上传的文件类型 , $maxsize : 允许大小 ,  $field : 上传控件名称 , $time : 自定义上传时间       
-    function upload($types = 'jpg|png', $maxsize = 1024, $field = 'attach', $time = '') {       
+    function upload($types = 'jpg|png|gif', $maxsize = 100024, $field = 'attach', $time = '') {       
         $this->allow_types = explode('|',$types);       
         $this->maxsize = $maxsize * 1024;       
         $this->field = $field;       
@@ -107,7 +107,7 @@ class upload {
     function execute() {       
         $files = array(); //成功上传的文件信息       
         $field = $this->field;
-
+        
         //todo:zhangliang 如果传单个文件 不是数组改编成数组.
         if(!is_array($_FILES[$field]['name'])) {
         	$_FILES[$field]['name'] = array($_FILES[$field]['name']);

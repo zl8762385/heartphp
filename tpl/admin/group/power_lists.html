@@ -3,10 +3,10 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>HeartPHP 后台管理系统</title>
-<link rel="stylesheet" href="<{echo $config['static_path_css']}>ztreestyle/zTreeStyle.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="<{$config['static_path_css']}>ztreestyle/zTreeStyle.css" type="text/css" />
 
-<script type="text/javascript" src="<{echo $config['static_path_js']}>ztree/jquery.ztree.core-3.5.js"></script>
-<script type="text/javascript" src="<{echo $config['static_path_js']}>ztree/jquery.ztree.excheck-3.5.js"></script>
+<script type="text/javascript" src="<{$config['static_path_js']}>ztree/jquery.ztree.core-3.5.js"></script>
+<script type="text/javascript" src="<{$config['static_path_js']}>ztree/jquery.ztree.excheck-3.5.js"></script>
 <SCRIPT type="text/javascript">
 		<!--
 		var setting = {
@@ -25,7 +25,8 @@
 				url:"<{echo get_url('admin', 'group', 'menu_list')}>",
 				autoParam:["id", "name=n", "level=lv"],
 				otherParam:{"otherParam":"zTreeAsyncTest"},
-				dataFilter: filter
+				dataFilter: filter,
+				type:'GET'
 			},  
             callback: {   
                 onCheck: onCheck  

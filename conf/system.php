@@ -3,7 +3,7 @@
  *  system.php 系统配置文件
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -16,18 +16,19 @@ return array(
 			'heartphp' => array(
 				'host' => 'localhost',
 				'user' => 'root',
-				'password' => 'v90v70v00',
+				'password' => ‘123456’,
 				'db_name' => 'heartphp',
 				'charset' => 'utf8',
 				'table_prefix' => 'heart_',
-				'engine' => 'MyISAM'
+				'engine' => 'MyISAM',
+				'port' => 3306
 			)
 		),
 		'mssql' => array(
 			'heartphp' => array(
 				'host' => 'localhost',
 				'user' => 'sa',
-				'password' => 'v90v70v00',
+				'password' => ‘123456’,
 				'db_name' => 'test',
 				'table_prefix' => 'heart_',
 			)
@@ -35,7 +36,7 @@ return array(
 	),
 	'cache' => array(//缓存配置
 		'cache_switch'=> true,//false=关 true=开
-		'type'=> 'redis',//默认采用file [file, memcache, redis, xcache]
+		'type'=> 'memcache',//默认采用file [file, memcache, redis, xcache]
 		'memcache'=> array (//memcache
 			'host'=>'127.0.0.1',
 			'port'=>'11211',
@@ -63,7 +64,7 @@ return array(
 	'log_path' => SYSTEM_PATH.'data/log/',
 
 	//开启pathinfo  {true:开启, false:关闭}
-	'path_info' => false,
+	'path_info' => true,
 
 	//hooks插件机制配置
 	'hooks' => array(
@@ -77,7 +78,8 @@ return array(
 	'template_config' => array(
 		'template_suffix'    => '.html',
 		'template_path'      => SYSTEM_PATH.'tpl/',
-		'template_c'         => SYSTEM_PATH.'data/template_c/'
+		'template_c'         => SYSTEM_PATH.'data/template_c/',
+		'template_label'     => SYSTEM_PATH.'functions/template_label/',//模板标签函数 路径
 	)
 
 );

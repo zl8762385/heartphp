@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * 后台管理系统 group
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -21,7 +21,7 @@ class groupController extends helper_baseadminController {
 
 	//list
 	public function index () {
-		$page = core::gpc('p');
+		$page = gpc('p');
 		list($count, $lists) = $this->db->select_all('*', '', '', '', $page, $this->pagesize);
 
 		//print_r($lists);
@@ -32,8 +32,8 @@ class groupController extends helper_baseadminController {
 
 	//add
 	public function add() {
-		if(core::gpc('dosubmit','P')) {
-			$data = core::gpc('data', 'P');
+		if(gpc('dosubmit','P')) {
+			$data = gpc('data', 'P');
 
 			$this->comm_check_data('_empty', $data['name'], '请输入用户组名称！', '', get_url('admin', 'group', 'add'));
 
@@ -50,11 +50,11 @@ class groupController extends helper_baseadminController {
 
 	//edit
 	public function edit(){
-		$id = core::gpc('id', 'R');
+		$id = gpc('id', 'R');
 		$this->comm_check_data('_empty', $id, '操作错误.');
 
-		if(core::gpc('dosubmit', 'P')) {
-			$data = core::gpc('data', 'P');
+		if(gpc('dosubmit', 'P')) {
+			$data = gpc('data', 'P');
 			$this->comm_check_data('_empty', $data['name'], '请输入用户组名称！', '', get_url('admin', 'group', 'add'));
 
 			if(!empty($data['group_value'])) {
@@ -73,7 +73,7 @@ class groupController extends helper_baseadminController {
 
 	//delete
 	public function delete() {
-		$id = intval(core::gpc('id'));
+		$id = intval(gpc('id'));
 		$this->db->delete('id='.$id) && $this->show_message('数据删除成功！', '', get_url('admin', 'group', 'index'));
 	}
 

@@ -1,32 +1,47 @@
 <{include file="public/header.html"}> 
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+</script>
 
-<div class="col w10 margin_top_10 buttons_demo">
-    <a href="<{echo get_url('admin', 'model', 'index')}>" class="button"><span>列表</span></a>
-    <a class="button" href="<{echo get_url('admin', 'model', 'add')}>"><small class="icon plus"></small><span>增加模型</span></a>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    <li><a href="<{echo get_url('admin', 'model', 'index')}>">模型列表</a></li>
+    </ul>
 </div>
 
-<div class="col w10">
-        <table>
+
+<div class="rightinfo">
+
+    <div class="tools">
+    
+      <ul class="toolbar">
+        <li class="click">
+            <a href="<{echo get_url('admin', 'model', 'add')}>"><span><img src="<{echo $config['static_path_images']}>new_admin/t01.png" /></span>添加模型</a>
+        </li>
+    
+        </ul>
+        
+        
+        <!-- <ul class="toolbar1">
+        <li><span><img src="<{echo $config['static_path_images']}>new_admin/t05.png" /></span>设置</li>
+        </ul> -->
+    
+    </div>
+
+
+          <table class="tablelist">
             <thead>
               <tr>
                 <th>ID</th>
                 <th>模型名称</th>
                 <th>数据表名</th>
                 <th>描述</th>
-                <th></th>
                 <th>操作</th>
               </tr>
             </thead>
-            <tfoot>
-              <tr>
-                <td colspan="6">
-                 
-                  <div class="pagination"> <{echo $pages}> </div>
-                  <!-- End .pagination -->
-                  <div class="clear"></div>
-                </td>
-              </tr>
-            </tfoot>
+
             <tbody>
             <{foreach from=$lists item=v key=k}>
               <tr>
@@ -34,15 +49,18 @@
                 <td><{$v['name']}></td>
                 <td><{$v['table_name']}></td>
                 <td><{$v['description']}></td>
-                <td></td>
                 <td>
-                  <a href="<{echo get_url('admin', 'model', 'filed', 'id='.$v['id'].'')}>" title="">管理字段</a> 
-                  <a href="<{echo get_url('admin', 'model', 'edit', 'id='.$v['id'].'')}>" title="">修改</a> 
-                  <a href="javascript:_confirm('<{echo get_url('admin', 'model', 'delete', 'id='.$v['id'].'')}>', '您确认要删除该信息吗?')" title="">删除</a>
+                  <a href="<{echo get_url('admin', 'model', 'filed', 'id='.$v['id'].'')}>" title=""><{echo icons('list', '管理字段')}></a> 
+                  <a href="<{echo get_url('admin', 'model', 'edit', 'id='.$v['id'].'')}>" title=""><{echo icons('edit', '修改')}></a> 
+                  <a href="javascript:_confirm('<{echo get_url('admin', 'model', 'delete', 'id='.$v['id'].'')}>', '您确认要删除该信息吗?')" title=""><{echo icons('delete', '删除')}></a>
                
                 </td>
               </tr>
             <{/foreach}>
             </tbody>
           </table>
+</div>
+
+<div class="pagin">
+  <div class="pagination"> <{echo $pages}> </div>
 </div>

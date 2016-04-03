@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  *  template.class.php   模板解析类
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -19,19 +19,36 @@ class template {
 	private $template_tag_left = '<{';//模板左标签
 	private $template_tag_right = '}>';//模板右标签
 	private $template_c = '';//编译目录
-	private $template_path = '';//模板完整路径 D:/PHPnow/htdocs/heartphp/tpl/ad/index/
+	private $template_path = '';//模板完整路径 /home/zhangliang/workspace/webapps/heartphp
 	private $template_name = '';//模板名称 index.html
+	private $template_label = array();//模板标签运行中加载的文件
 
 
 	//定义每个模板的标签的元素
 	private $tag_foreach = array('from', 'item', 'key');
-	private $tag_include = array('file');//目前只支持读取模板默认路径
+//	private $tag_include = array('file');//目前只支持读取模板默认路径
 
 	public function __construct($conf) {
 		$this->conf = &$conf;
-
-		$this->template_c = $this->conf['template_config']['template_c'];//编译目录
+		$this->get_this();
+	}
+	
+	/**
+	 * 获取当前THIS相关的参数
+	 */
+	private function get_this() {
+		//编译目录
+		$this->template_c = $this->conf['template_config']['template_c'];
+		
+		//获取模板后缀名
 		$this->_tpl_suffix = $this->tpl_suffix();
+			
+		//获取模板标签函数的路径
+		if(isset($this->conf['template_config']['template_label'])) {
+			$this->template_label_path = $this->conf['template_config']['template_label'];	
+		} else {
+			$this->template_label_path = SYSTEM_PATH.'functions/template_label/';
+		}
 	}
 
 
@@ -59,15 +76,7 @@ class template {
 		preg_match_all("/".$this->template_tag_left.$pattern.$this->template_tag_right."/is", $content, $match);
 		return $match;
 	}
-	/**
-	 * 模板文件后缀 
-	 */	
-	public function tpl_suffix() {
-		$tpl_suffix = empty($this->conf['template_config']['template_suffix']) ? 
-							$this->tpl_suffix : 
-							$this->conf['template_config']['template_suffix'] ;
-		return $tpl_suffix;
-	}
+	
 
 	/**
 	 *	此处不解释了
@@ -92,7 +101,10 @@ class template {
 		$filename = $this->get_filename($filename);//获取模板名
 
 		$tpl_path_arr = $this->get_tpl($filename, $view_path);//获取TPL完整路径 并且向指针传送路径以及名称
-		if(!$tpl_path_arr) core::show_error($filename.$this->_tpl_suffix.'模板不存在');
+		if(!$tpl_path_arr) {
+			core::show_error($filename.$this->_tpl_suffix.'模板不存在');
+			exit;
+		}
 
 		//编译开始
 		$this->view_path_param = $view_path;//用户传递过来的模版跟目录
@@ -176,19 +188,41 @@ class template {
 		return $ret_file;
 	}
 
+	/**
+	 * 加载模板标签函数路径
+	 * @return [type] [description]
+	 */
+	private function load_template_label() {
+		if(!isset($this->template_label) || empty($this->template_label)) return false;
+
+		$include = array();
+		foreach($this->template_label as $k => $v) {
+			$p = $v['filepath'].PHPFILE_EXT;
+			if(!file_exists($p)) {
+				core::show_error($p." <br/>\n文件不存在，请检查对应文件！");
+			}
+			$include[$p] = "include('$p');";
+		}
+		
+		if(is_array($include) && !empty($include)) {
+			$include_str = implode("\n", $include);
+		}
+		return "<?php {$include_str}?>";
+	}
+
 
 	/**
 	 *	模板文件主体
 	 * 	@param  string  $str    内容
 	 *  @return html
 	 */
-	private function body_content($str) {
-		//解析
-		$str = $this->parse($str);
-
+	private function body_content($body_content) {
+		$body_content = $this->parse($body_content);
 		$header_comment = "Create On##".time()."|Compiled from##".$this->template_path.$this->template_name;
-		$content = "<?php if(!defined('IS_HEARTPHP')) exit('Access Denied');/*{$header_comment}*/?>\r\n$str";
-
+		
+		$content = "<?php if(!defined('IS_HEARTPHP')) exit('Access Denied');/*{$header_comment}*/?>\r\n";
+		$content .= $this->load_template_label()."\r\n";//写入板标签的函数文件 
+		$content .= $body_content;//解析
 		return $content;
 	}
 
@@ -202,6 +236,9 @@ class template {
 
 		//include
 		$content = $this->parse_include($content);
+
+		//template_tags
+		$content = $this->parse_label($content);//模板标签函数
 
 		//echo
 		$content = $this->parse_echo($content);
@@ -223,6 +260,62 @@ class template {
 	private function parse_hp_article($content) {
 		$match = $this->preg_match_all("HP:article\s+(.*?)", $content);
 		print_r($match);
+	}
+
+	/**
+	 * 模板标签函数
+	 * 使用方法 <{label::videolist2 limit="53" order="id desc" pagestatus="false" catid="aa" return="data3"}>
+	 * @param  [type] $content [description]
+	 * @return [type]          [description]
+	 */
+	private function parse_label($content) {
+		if(empty($content)) return false;
+
+		$match = $this->preg_match_all("label::([\w]+) (.*?)", $content);
+		if(!isset($match[1])) return false;
+
+		foreach ($match[1] as $k => $v) {
+			$argv = array();
+
+			if(isset($match[2][$k])) {
+				$argv_value = preg_split("/([\w]+)=\"/", $match[2][$k]);
+				$argv_key = preg_split("/=\"(.*?)\"/", $match[2][$k]);
+				//对标签VALUE重建数组
+				$re_argv_value = $this->re_array($argv_value);
+				$re_argv_key = $this->re_array($argv_key);
+				if(!empty($re_argv_value) && !empty($re_argv_key)) {
+					foreach($re_argv_value as $kk => $vv) {
+						$argv[$re_argv_key[$kk]] = $vv;
+					}
+				}
+			}
+
+			$func_name = "template_func_$v";
+			$this->template_label[] = array('filepath' => $this->template_label_path.$func_name, 'func_name' => $func_name);
+
+			$return_param = (isset($argv['return'])) ? $argv['return'] : 'data' ;
+			$content = str_replace($match[0][$k], "<?php \${$return_param}= ''; \${$return_param}= call_user_func(\"{$func_name}\", ".var_export($argv, true).")?>", $content);
+		}
+
+		return $content;
+		//call_user_func("template_tags.{$match[1][0]}", 'dsf');
+	}
+
+	/**
+	 * 对数组重建索引
+	 * @param  [type] $arr [description]
+	 * @return [type]      [description]
+	 */
+	private function re_array($arr) {
+		if(!is_array($arr) || empty($arr))  return false;
+		$data = array();
+		foreach($arr as $k => $v) {
+			if(empty($v)) continue;
+			$v = str_replace("\"", "", $v);
+			$data[] = trim($v);
+		}
+
+		return $data;
 	}
 	/**
 	 * echo 如果默认直接<{$config['domain']}> 转成 <?php echo $config['domain']?>
@@ -293,17 +386,17 @@ class template {
 	/**
 	 * 解析 include    include标签不是实时更新的  当主体文件更新的时候 才更新标签内容，所以想include生效 请修改一下主体文件
 	 * 记录一下 有时间开发一个当DEBUG模式的时候 每次执行删除模版编译文件
-	 * 使用方法 <{include file=""}>
+	 * 使用方法 <{include file="" variable="参数1" variable="参数2"}>
 	 * @param $content 模板内容
 	 * @return html
 	 */
 	private function parse_include($content) {
 		if(empty($content)) return false;
 
-		//preg_match_all("/".$this->template_tag_left."include\s+(.*?)".$this->template_tag_right."/is", $content, $match);
 		$match = $this->preg_match_all("include\s+(.*?)", $content);
 		if(!isset($match[1]) || !is_array($match[1])) return $content;
 
+		
 		foreach($match[1] as $match_key => $match_value) {
 			$a = preg_split("/\s+/is", $match_value);
 
@@ -311,39 +404,43 @@ class template {
 			//分析元素
 			foreach($a as $t) {
 				$b = explode('=', $t);
-				if(in_array($b[0], $this->tag_include)) {
-					if(!empty($b[1])) {
-						$new_tag[$b[0]] = str_replace("\"", "", $b[1]);
-					} else {
-						core::show_error('模板路径不存在!');
-					}
+				$variable = '';
+				if(!empty($b[1])) {
+					$variable = substr($b[1],1);	
+					$variable = substr($variable,0,strlen($variable)-1);	
 				}
+				if(empty($b[0])) continue;
+				$new_tag[$b[0]] = $variable;
 			}
-
+			
 			extract($new_tag);
+			
 			//查询模板文件
 			foreach($this->conf['view_path'] as $v){
+				if(empty($file)) core::show_error("include($v) <br/>模板文件路径出问题了."); 
 				$conf_view_tpl = $v.$file;//include 模板文件
 
 				if(is_file($conf_view_tpl)) {
-					$c = $this->read_file($conf_view_tpl);
-
+					$_content = $this->read_file($conf_view_tpl);
 					$inc_file = str_replace($this->_tpl_suffix, '', basename($file));
-
 					$this->view_path_param = dirname($file).'/';
-					$compile_dirpath = $this->check_temp_compile();
-					$include_file = $this->template_replace($c, $compile_dirpath, $inc_file);//解析
+					
+					$variable_str = '';
+					foreach($new_tag as $nk => $nv) {
+						$variable_str .= '$'.$nk.' = "'. $nv .'";';
+					}
+					
+					$include_file = $this->template_replace($_content, $this->check_temp_compile(), $inc_file);//解析
 					break;
 				} else {
-					core::show_error('模板文件不存在,请仔细检查 文件:'. $conf_view_tpl);
+					core::show_error("{$conf_view_tpl} <br/> 模板文件不存在.");
 				}
 			} 
-	
-			$content = str_replace($match[0][$match_key], '<?php include("'.$include_file.'")?>', $content);
+			
+			$content = str_replace($match[0][$match_key], '<?php '.$variable_str.'include("'.$include_file.'")?>', $content);
 		}
 
 		return $content;
-			
 	}
 	/**
 	 * 解析 foreach
@@ -481,37 +578,6 @@ class template {
 	}
 
 	/**
-	 *  读取编译后模板的第一行 并分析成数组
-	 * 	@param  string  $filepath  文件路径
-	 *  @param  number  $line        行数
-	 *  @return 返回指定行数的字符串 
-	 */
-	/*
-	private function get_compile_header($filepath, $line = 0) {
-
-		if(($file_arr = @file($filepath)) === false) {
-			core::show_error($filepath.'<br/>读取文件失败，请检查文件权限！');
-		}
-		return $file_arr[0];
-	}
-	*/
-
-	/**
-	 * 分析头部注释的日期
-	 * 	@param  string  $cotnent  编译文件头部第一行
-	 *  @return 返回上一次日期 
-	 */
-	/*
-	private function get_compile_header_comment($content) {
-		preg_match("/\/\*(.*?)\*\//", $content, $match);
-		if(!isset($match[1]) || empty($match[1])) core::show_error('编译错误!');	
-		$arr = explode('|', $match[1]);
-		$arr_date = explode('##', $arr[0]);
-
-		return $arr_date[1];
-	}
-	*/
-	/**
 	 *	获取模板完整路径 并返回已存在文件
 	 * 	@param  string  $filename   文件名
 	 *  @param  string  $view_path  模板路径 
@@ -536,6 +602,7 @@ class template {
 				return true;
 			} else {
 				core::show_error($filename.$this->_tpl_suffix.'模板不存在');
+				exit;
 			}
 		}
 	}
@@ -546,9 +613,15 @@ class template {
 	 *  @return URL D和M的拼接路径
 	 */
 	private function get_tpl_path($path = '') {
-		core::get_directory_name() && $path_arr[0] = core::get_directory_name();
-		core::get_controller_name() && $path_arr[1] = core::get_controller_name();
-		(is_array($path_arr)) ? $newpath = implode('/', $path_arr) : core::show_error('获取模板路径失败!') ;
+		if(defined('__D__')) {
+			$path_arr[0] = __D__;
+		}
+
+		if(defined('__C__')) {
+			$path_arr[1] = __C__;
+		}
+
+		$newpath = (is_array($path_arr)) ? implode('/', $path_arr) : core::show_error('获取模板路径失败!'); 
 
 		return $path.$newpath.'/';
 	}
@@ -582,6 +655,18 @@ class template {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * 模板文件后缀 
+	 */	
+	public function tpl_suffix() {
+		
+		if(empty($this->conf['template_config']['template_suffix'])) {
+			return $this->tpl_suffix;	
+		} else {
+			return $this->conf['template_config']['template_suffix'];	
+		}
 	}
 
 	public function __destruct(){

@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  *  baseadmin 后台管理系统 助手文件 controller引用中可以extends这个助手
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -17,7 +17,7 @@ class helper_baseadminController extends base_controller {
 	public function __construct() {
 		parent::__construct();
 
-		if(!in_array(core::get_action_name(), $this->pass_action)) {
+		if(!in_array(__A__, $this->pass_action)) {
 			$this->check_user();//检查用户登录
 			$this->menu();//后台左侧菜单
 		}
@@ -28,41 +28,86 @@ class helper_baseadminController extends base_controller {
 	 */
 	public function check_user() {
 		$uname = get_cookie('uname', '', 2);
-		$uid   = get_cookie('uid');
+		$encrypt = get_cookie('ept', '', 2);
+		$uid   = get_cookie('uid', '', 2);
+		$lastlogintime = get_cookie('lastlogintime','', 2);
+
 		if(!empty($uname) && !empty($uid)) {
 			$db = D('admin_user_model');
-			$data = $db->get_user($uname, 'username');
-			if(!$data) $this->redirect(get_url('admin', 'index', 'login'));
+			$data = $db->get_one("username='{$uname}' AND userid='{$uid}'");
+			if(!$data) $this->redirect(get_url('admin', 'index', 'logout'));
+			//如果找到了该用户，还需要进行密码 加密的检测，一致才可通过
+			if(!isset($data['encrypt']) || $data['encrypt'] != $encrypt) $this->redirect(get_url('admin', 'index', 'logout'));
+
 
 			$data['groupinfo'] = $this->get_group($data['groupid']);//获取用户组信息
+		
+			//通过了，但是这里需要检查用户last登陆时间，每人只能登陆一次
+			if($lastlogintime != $data['lastlogintime']) {
+				$this->redirect(get_url('admin', 'index', 'logout'));
+			}
+			
 			$this->userinfo = $data;
 
-			$this->action_log();//操作日志
+			$this->action_log(array(//保存 操作做基本信息
+				'userid' => $this->userinfo['userid'],
+				'username' => $this->userinfo['username'],
+				'truename' => $this->userinfo['truename']
+			));
+			
+			$this->is_token();//对令牌进行验证
+
 			$this->view->assign('userinfo', $this->userinfo);
 		} else {
-			$this->redirect(get_url('admin', 'index', 'login'));
+			$this->redirect(get_url('admin', 'index', 'logout'));
 		}
 	}
 
-	final public function action_log() {
+	public function is_token(){
+		//登陆成功，检查form提交是否执行了crsf  对POST
+		if($_SERVER['REQUEST_METHOD'] == 'POST'){
+			if(!isset($_POST['is_token']) || empty($_POST['is_token'])) $this->show_message('非法提交！');
+			if($this->get_token() !== $_POST['is_token']) $this->show_message('非法提交！');
+
+		} else {//post请求时 不用生成token
+			if(!isset($_COOKIE['f_token']) && empty($_COOKIE['f_token'])) {
+				$this->set_token();//登陆成功 生成form_token
+			}
+		}
+	}
+
+	/**
+	 * 设置TOTKEN
+	 */
+	private function set_token() {
+		$token = $this->gen_token();;
+		setcookie('f_token', $token);
+		$_COOKIE['f_token'] = $token;
+	}
+
+	/**
+	 * 获取token
+	 * @return [type] [description]
+	 */
+	public function get_token() {
+		return $_COOKIE['f_token'];
+	}
+
+	final public function action_log($op = array()) {
 		$log_db = D('action_log_model');
 
 		$data = array();
 		if(isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {//POST记录
-			$op = array(//保存 操作做基本信息
-							'userid' => $this->userinfo['userid'],
-							'username' => $this->userinfo['username'],
-							'truename' => $this->userinfo['truename']
-						); 
+
 			$data['ip'] = GetIP();
-			$data['d'] = $_GET['d'];
-			$data['c'] = $_GET['c'];
-			$data['a'] = $_GET['a'];
+			$data['d'] = __D__;
+			$data['c'] = __C__;
+			$data['a'] = __A__;
 			$data['method'] = 'POST';
 			$data['referer'] = HTTP_REFERER;
 			$data['createtime'] = time();
-			$data['op'] = array2string($op);
-			$data['submit_data'] = array2string($_POST);
+			$data['op'] = json_encode($op);
+			$data['submit_data'] = json_encode($_POST);
 			$log_db->insert($data);
 		}
 
@@ -89,7 +134,7 @@ class helper_baseadminController extends base_controller {
 
 		$tree = new tree();
 		$current_url = $this->get_currenturl();//当前URL
-		$config = core::load_config('config');
+		$config = C('', 'config');
 
 		$where = array();
 		if($this->userinfo['userid'] == 1) {//创始人读取全部菜单	
@@ -108,7 +153,7 @@ class helper_baseadminController extends base_controller {
 		$_where = implode(' AND ', $where);
 
 		$data = $db->select('*', $_where, '', 'menuorder asc, id asc');
-		empty($data) && $this->show_message('无菜单获取,请检查!');
+		//empty($data) && $this->show_message('无菜单获取,请检查!');
 
 		$newarr = array();
 		foreach($data as $k => $v) {
@@ -120,12 +165,6 @@ class helper_baseadminController extends base_controller {
 		}
 
 		if(!empty($newarr)) {
-			$tree->init($newarr);
-			$strs = "<span class='\$icon_type'><a href='\$url' target='right'>\$name</a></span>";
-			$strs2 = "<span class='folder'>\$name</span>";
-
-			$categorys = array();
-			//$categorys = $tree->get_treeview_admin(0,'category_tree', $strs, $strs2);
 
 			//获取一级菜单
 			$menu_master = array();
@@ -135,19 +174,7 @@ class helper_baseadminController extends base_controller {
 				}
 			}
 
-			if(!empty($menu_master)) {
-
-				foreach($menu_master as $k => $v) {
-					$category_html = '';
-					$category_html = $tree->get_treeview_admin($v['id'],'category_tree', $strs, $strs2);
-					$categorys[$v['id']] = str_replace("'", '"', trim($category_html));
-				}
-
-				$this->view->assign('menu_mater', $menu_master);
-			}
-
-			//其他二级菜单
-			$this->view->assign('menu_data', $categorys);
+			$this->view->assign('menu_mater', $menu_master);
 		}
 
 	}
@@ -161,12 +188,19 @@ class helper_baseadminController extends base_controller {
 		if(empty($group_value)) $this->show_message('没有权限!');
 
 		$where = array();
-		if(core::get_directory_name()) $where[0] = 'directory="'.core::get_directory_name().'"';
-		if(core::get_controller_name()) $where[1] = 'controller="'.core::get_controller_name().'"';
-		if(core::get_action_name()) $where[2] = 'methed="'.core::get_action_name().'"';
+		if(defined('__D__')) $where[0] = 'directory="'.__D__.'"';
+		if(defined('__C__')) $where[1] = 'controller="'.__C__.'"';
+		if(defined('__A__')) $where[2] = 'methed="'.__A__.'"';
 
 		$_where = implode(' AND ', $where);
 		$_where = 'id in('.$group_value.') AND '.$_where;
+
+		$allow_url = array('admin_index_main', 'admin_index_top', 'admin_index_left', 'admin_index_home');
+		$allow_str = __D__.'_'.__C__.'_'.__A__;
+		if(in_array($allow_str, $allow_url)) {
+			return true;
+		}
+
 		$data = $db->get_one($_where);
 		if(empty($data)) $this->show_message('抱歉,您没有访问当前页面的权限,请联系管理员.');
 	}
@@ -176,8 +210,7 @@ class helper_baseadminController extends base_controller {
 	 * @return  url
 	 */
 	public function get_currenturl () {
-		$current_url = get_url(core::get_directory_name(), core::get_controller_name(), core::get_action_name());
-		return $current_url;
+		return get_url(__D__, __C__, __A__);
 	}
 
 	/**

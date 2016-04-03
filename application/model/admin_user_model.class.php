@@ -47,8 +47,10 @@ class admin_user_model extends base_model {
 	 */
 	public function update_login_message(&$userinfo) {
 		$data = array();
-		$data['lastlogintime'] = time();
+		$data['lastlogintime'] = $data['updatetime'] = $data['lifetime'] = time();
 		$data['lastloginip'] = GetIP();
+
+		set_cookie('lastlogintime', $data['lastlogintime'], 0, '', 1);
 		$this->update($data, "userid='{$userinfo['userid']}'");
 	}
 }

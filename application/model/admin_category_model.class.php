@@ -11,4 +11,18 @@ class admin_category_model extends base_model {
 		global $conf;
 		parent::__construct($conf);
 	}
+
+	public function category_all_json() {
+		$data = $this->db->select('id, parentid, name', $this->table_name);
+		$newdata = array();
+		foreach($data as $k => $v) {
+			$url = get_url('admin', 'content', 'content_list', "catid={$v['id']}");
+			$newdata[$k] = $v;
+			$newdata[$k]['open'] = 'true';
+			$newdata[$k]['url'] = $url;
+			$newdata[$k]['target'] = 'right';
+		}
+	
+		return json_encode($newdata);
+	}
 }

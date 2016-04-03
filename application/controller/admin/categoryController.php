@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * 后台管理系统
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang <zl8762385@163.com> <qq:979314>
+ * @author              zhangxiaoliang <zl8762385@163.com> <qq:3677989>
  * @lastmodify			2013.04.09
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -21,7 +21,7 @@ class categoryController extends helper_baseadminController {
 
 	//lists
 	public function index() {
-		$page = core::gpc('p');
+		$page = gpc('p');
 		$tree = new tree();
 		$tree->icon = array('&nbsp;&nbsp;&nbsp;│ ','&nbsp;&nbsp;&nbsp;├─ ','&nbsp;&nbsp;&nbsp;└─ ');
 		$tree->nbsp = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -32,13 +32,13 @@ class categoryController extends helper_baseadminController {
 		foreach($data as $r) {
 			$r['is_display'] = (empty($r['is_display'])) ? '隐藏' : '显示' ;
 			$r['create_date'] = date('Y-m-d H:i:s', $r['createtime']);
-			$r['str_manage'] = '<a href="'.get_url('admin', 'category', 'add', 'id='.$r['id'].'').'" title="">添加子栏目</a>&nbsp;&nbsp;<a href="'.get_url('admin', 'category', 'edit', 'id='.$r['id'].'').'" title="">修改</a>&nbsp;&nbsp;<a href="javascript:_confirm(\''.get_url('admin', 'category', 'delete', 'id='.$r['id'].'').'\', \'您确认要删除该信息吗?\')" title="">删除</a>';
+			$r['str_manage'] = '<a href="'.get_url('admin', 'category', 'add', 'id='.$r['id'].'').'" title="">'.icons('add', '添加子栏目').'</a>&nbsp;&nbsp;<a href="'.get_url('admin', 'category', 'edit', 'id='.$r['id'].'').'" title="">'.icons('edit', '修改').'</a>&nbsp;&nbsp;<a href="javascript:_confirm(\''.get_url('admin', 'category', 'delete', 'id='.$r['id'].'').'\', \'您确认要删除该信息吗?\')" title="">'.icons('delete', '删除').'</a>';
 			$r['parentid_node'] = ($r['parentid'])? ' class="child-of-node-'.$r['parentid'].'"' : '';
 			$array[] = $r;
 		}
 
 		$str  = "<tr id='node-\$id' \$parentid_node>
-		<td align='center'><input style='width:50px;text-align:center;' type='text' name='orders[\$id]' value='\$orders'/></td>
+		<td align='center'><input class='dfinput' style='text-align:center;width:60px;height:20px;margin:0 10px 0 0;' type='text' name='orders[\$id]' value='\$orders'/></td>
 		<td align='center'>\$id</td>
 		<td align='left'>\$spacer\$name</td>
 		<td align=''>\$is_display</td>
@@ -56,8 +56,8 @@ class categoryController extends helper_baseadminController {
 	//add
 	public function add() {
 
-		if(core::gpc('dosubmit', 'R')) {//add
-			$data = core::gpc('data', 'R');
+		if(gpc('dosubmit', 'R')) {//add
+			$data = gpc('data', 'R');
 
 			$this->comm_check_data('_isset_empty', $data['modelid'], '请选择模型');
 			$this->comm_check_data('_empty', $data['name'], '请输入名称');
@@ -66,14 +66,28 @@ class categoryController extends helper_baseadminController {
 			$check_name = $this->db->get_one("name='".$data['name']."'");
 			$this->comm_check_data('_not_empty', $check_name, "[{$data['name']}] 已存在!");
 
+			//$images = (isset($data['images'])) ?  : ;
+			$catetory_images = '';
+			if(isset($data['images']['pic_title']) && is_array($data['images']['pic_title'])) {//如果有上传图片 and file，带有标题的，单独处理
+				$pic_value = array();
+				foreach($data['images']['pic_title'] as $pic_k => $pic_v) {
+					$pic_value[] = array('title' => $pic_v, 'filename' => $pic_k);
+				}
+
+				$catetory_images = json_encode($pic_value);
+			}
+		
 			$insertdata = array();
 			$insertdata['name'] = $data['name'];
 			$insertdata['parentid'] = $data['parentid'];
+			$insertdata['description'] = $data['description'];
+			$insertdata['images'] = $catetory_images;
 			$insertdata['modelid'] = $data['modelid'];
 			$insertdata['is_display'] = $data['is_display'];
 			$insertdata['status'] = 1;//状态，暂时为通过 后续增加功能使用
 			$insertdata['operate'] = $this->userinfo['userid'];
 			$insertdata['createtime'] = time();
+			
 			$rt = $this->db->insert($insertdata);
 
 			if(!empty($data['parentid'])) {//插入父数据 节点
@@ -86,7 +100,7 @@ class categoryController extends helper_baseadminController {
 			$rt && $this->show_message('数据添加成功.', '', get_url('admin', 'category', 'index'));
 		}
 
-		$id = core::gpc('id');
+		$id = gpc('id');
 		$data = $this->db->get_one($id);
 		
 		$parentid = (empty($id)) ? 0 : $id ;
@@ -99,16 +113,25 @@ class categoryController extends helper_baseadminController {
 
 	//edit
 	public function edit() {
-		$id = core::gpc('id', 'R');
+		$id = gpc('id', 'R');
 		$this->comm_check_data('_empty', $id, '请输入ID.', '', get_url('admin', 'category', 'index'));
 
-		if(core::gpc('dosubmit', 'P')){
-			$data =  core::gpc('data', 'R');
+		if(gpc('dosubmit', 'P')){
+			$data =  gpc('data', 'R');
 
 			$this->comm_check_data('_empty', $data['name'], '请输入名称');
 
-			$rt = $this->db->update($data, 'id='.$id);
-			$rt && $this->show_message('数据修改成功.', '', get_url('admin', 'category', 'index'));
+			$catetory_images = '';
+			if(isset($data['images']['pic_title']) && is_array($data['images']['pic_title'])) {//如果有上传图片 and file，带有标题的，单独处理
+				$pic_value = array();
+				foreach($data['images']['pic_title'] as $pic_k => $pic_v) {
+					$pic_value[] = array('title' => $pic_v, 'filename' => $pic_k);
+				}
+
+				$data['images'] = json_encode($pic_value);
+			}
+		
+			$this->db->update($data, 'id='.$id) && $this->show_message('数据修改成功.', '', get_url('admin', 'category', 'index'));
 		}
 
 		$data = $this->db->get_one($id);
@@ -118,9 +141,10 @@ class categoryController extends helper_baseadminController {
 		$this->view->display('edit');
 	}
 
+
 	//delete
 	public function delete() {
-		$id = intval(core::gpc('id'));
+		$id = intval(gpc('id'));
 
 		//入桟 当前catid
 		array_push($this->catids, $id);
@@ -136,10 +160,10 @@ class categoryController extends helper_baseadminController {
 	 * 应用操作
 	 */
 	public function action() {
-		$actions_switch = core::gpc('actions_switch', 'R');
+		$actions_switch = gpc('actions_switch', 'R');
 		switch($actions_switch) {
 			case 'orders':
-				$orders = core::gpc('orders', 'P');
+				$orders = gpc('orders', 'P');
 				if(empty($orders)) $orders = array();
 				
 				foreach($orders as $k => $v) {
@@ -197,6 +221,7 @@ class categoryController extends helper_baseadminController {
 		return $newarr;
 	}
 
+	
 	public function __destruct() {
 		$this->db = NULL;
 	}

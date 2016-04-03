@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  *  base_controller.class.php   控制器基础类
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.07.13
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -12,33 +12,32 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
 
 class base_hooks {
 	//是否启动
-	private $enable = false;
+	protected $enable = false;
 
 	//hooks 路径
-	private $hooks_path;
+	protected $hooks_path;
 
 	//hooks 配置文件路径
-	private $hooks_config_path;
+	protected $hooks_config_path;
 
 	//hooks 配置文件数据
-	private $hooks_config_data = array();
+	protected $hooks_config_data = array();
 
 	//hooks 后缀
 	public $class_postfix = 'Hooks';
 
 	//hook 静态变量
-	private static $hook_instance  = array();
+	protected static $hook_instance  = array();
 
 	//位置偏移，设置核心框架中在什么地方加载hooks 
-	private $offset = array(
+	protected $offset = array(
 						'controller_top', //系统中执行，控制器执行前
 						'controller_bottom',//系统中执行，控制器执行后
 						'plugin'//插件模式 不在系统中运行，可以在任何地方调用
 					);
 
 	public function __construct() {
-		global $conf;
-		$_conf =& $conf['hooks'];
+		$_conf = C('hooks');
 		$this->enabled = $_conf['enable'];
 		$this->hooks_path = $_conf['path'];
 		$this->hooks_config_path = $_conf['config'];

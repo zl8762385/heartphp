@@ -1,11 +1,19 @@
 <{include file="public/header.html"}> 
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+</script>
 
-<div class="col w10 margin_top_10 buttons_demo">
-    <a href="<{echo get_url('admin', 'attachment', 'index')}>" class="button"><span>附件管理</span></a>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    <li><a href="<{echo get_url('admin', 'attachment', 'index')}>">附件列表</a></li>
+    </ul>
 </div>
 
-<div class="col w10">
-         <table>
+
+<div class="rightinfo">
+         <table class="tablelist">
             <thead>
               <tr>
                 <th>ID</th>
@@ -15,16 +23,7 @@
                 <th>操作</th>
               </tr>
             </thead>
-            <tfoot>
-              <tr>
-                <td colspan="6">
-                 
-                  <div class="pagination"> <{echo $pages}> </div>
-                  <!-- End .pagination -->
-                  <div class="clear"></div>
-                </td>
-              </tr>
-            </tfoot>
+       
             <tbody>
             <{foreach from=$lists item=v key=k}>
               <tr>
@@ -35,11 +34,15 @@
                 <td>
                   <{if $v['userid'] != 1}>
                 
-                  <a href="javascript:_confirm('<{echo get_url('admin', 'attachment', 'delete', 'id='.$v['id'].'')}>', '您确认要删除该信息吗?')" title="">删除</a>
+                  <a href="javascript:_confirm('<{echo get_url('admin', 'attachment', 'delete', 'id='.$v['id'].'')}>', '您确认要删除该信息吗?')" title=""><{echo icons('delete', '删除')}></a>
                   <{/if}>
                 </td>
               </tr>
             <{/foreach}>
             </tbody>
           </table>
+</div>
+
+<div class="pagin">
+  <div class="pagination"> <{echo $pages}> </div>
 </div>

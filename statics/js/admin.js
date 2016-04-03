@@ -36,25 +36,21 @@
 			
 
 			if(message != '') {
-				$('[node-type=error_message]').Message({
-					target:'[node-type=error_message]', 
-					type:'error', 
-					text:"错误提示："+message, 
-					time:2000
-				});
+				console.log("错误提示："+message)
+				$('[node-type=error_message]').html("错误提示："+message);
 			} else {
 				$.post(domain+'index.php?d=admin&c=index&a=check_login', {'username': username.val(), 'pwd': pwd.val()}, function (rt) {
 					if(rt == '1') {
 						location.href=domain+'index.php?d=admin&c=index&a=main';
 					} else {
-						$('[node-type=error_message]').Message({
-							target:'[node-type=error_message]', 
-							type:'error', 
-							text:"错误提示："+ rt
-						});
+						$('[node-type=error_message]').html("错误提示："+rt);
 					}
 				});
 			}
+
+			setTimeout(function () {
+				$('[node-type=error_message]').html("");
+			}, '1500');
 
 		}
 	});

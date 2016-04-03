@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * 后台管理系统
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang <zl8762385@163.com> <qq:979314>
+ * @author              zhangxiaoliang <zl8762385@163.com> <qq:3677989>
  * @lastmodify			2013.04.09
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -21,9 +21,12 @@ class contentController extends helper_baseadminController {
 		$this->model_filed_db = D('model_filed_model');//模型字段
 		$this->pagesize = 10;
 		$this->category = $this->get_category();//当前栏目信息
-
+		$this->category_all_tree();
 	}
 
+	public function category_all_tree() {
+		$this->view->assign('categorys_tree', $this->db->category_all_json());
+	}
 	/**
 	 * 查看模型是否存在
 	 * @return
@@ -34,11 +37,18 @@ class contentController extends helper_baseadminController {
 	}
 
 	/**
+	 * 获取栏目
+	 * @return
+	 */
+	public function categorys() {
+		$this->view->display();
+	}
+	/**
 	 * 栏目列表
 	 * @return 
 	 */
 	public function index() {
-		$page = core::gpc('p');
+		$page = gpc('p');
 		$tree = new tree();
 		$tree->icon = array('&nbsp;&nbsp;&nbsp;│ ','&nbsp;&nbsp;&nbsp;├─ ','&nbsp;&nbsp;&nbsp;└─ ');
 		$tree->nbsp = '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -51,7 +61,7 @@ class contentController extends helper_baseadminController {
 
 			if(empty($r['attach_id'])) {
 				$r['name']  = $r['name'];
-				$r['str_manage'] = '<a href="'.get_url('admin', 'content', 'content_list', 'catid='.$r['id'].'').'" title="">查看内容列表</a>';
+				$r['str_manage'] = '<a href="'.get_url('admin', 'content', 'content_list', 'catid='.$r['id'].'').'" title=""><span style="font-weight:800;color:red">'.icons('list', '查看文章列表').'</span></a>';
 			} else {
 				$r['name'] = '<span style="color:red;">'.$r['name'].'</span>';
 				$r['str_manage'] = '';
@@ -62,7 +72,7 @@ class contentController extends helper_baseadminController {
 		}
 
 		$str  = "<tr id='node-\$id' \$parentid_node>
-		<td align='center'>\$id</td>
+		<td align='left'>\$id</td>
 		<td align=''>\$spacer\$name</td>
 		<td align=''>\$str_manage</td>
 		</tr>";
@@ -79,13 +89,15 @@ class contentController extends helper_baseadminController {
 	 */
 	public function content_list() {
 		$this->model_exists();//查看模型是否存在
-		$page = core::gpc('p');
+		$page = gpc('p');
+		$catid = intval(gpc('catid'));
+		if(empty($catid)) $this->show_message('参数错误.');
 		$filed_list = $this->get_filed_info(array('m_id' => $this->category['modelid'], 'content_list' => 1));
 		if(empty($filed_list)) $this->show_message('请模型管理中设置默认显示字段.');
 
 		//设置模型
 		$this->content_db->set_model($this->category['modelid']);
-		list($count, $lists) = $this->content_db->select_all('*', '', '', 'id desc', $page, $this->pagesize);
+		list($count, $lists) = $this->content_db->select_all('*', "catid='$catid'", '', 'id desc', $page, $this->pagesize);
 
 	 	$this->view->assign("pages", $this->page($count, $this->pagesize));
 	 	$this->view->assign("lists", $lists);
@@ -133,7 +145,7 @@ class contentController extends helper_baseadminController {
 				if(!in_array($k, $diff_filed)) {//抛弃没用的字段 对数据进行重组
 					//字段进行字符串 取值范围判断
 					if(isset($new_filed_data[$k]) && $new_filed_data[$k]['number_range']){
-						$number_range = string2array($new_filed_data[$k]['number_range']);
+						$number_range = json_decode($new_filed_data[$k]['number_range'],1);
 						if(!empty($number_range['min']) && strlen($v) < $number_range['min']) {
 							$this->show_message("[{$new_filed_data[$k]['title']}]最小 {$number_range['min']}个字符");
 						}
@@ -151,7 +163,17 @@ class contentController extends helper_baseadminController {
 					}
 
 					//如果是数组 转换成字符串
-					if(is_array($v)) $v = ",".implode(',', $v).",";
+					if(isset($v['pic_title']) && is_array($v['pic_title'])) {//如果有上传图片 and file，带有标题的，单独处理
+						$pic_value = array();
+						foreach($v['pic_title'] as $pic_k => $pic_v) {
+							$pic_value[] = array('title' => $pic_v, 'filename' => $pic_k);
+						}
+
+						$v = json_encode($pic_value);
+					} else {
+						if(is_array($v)) $v = ",".implode(',', $v).",";
+					}
+					
 
 					//对日期进行转换
 					if(isset($new_filed_data[$k]['type']) && $new_filed_data[$k]['type'] == 'datetime') {
@@ -159,10 +181,10 @@ class contentController extends helper_baseadminController {
 					}
 					
 					//OK 通过喽.
-					$newdata[$k] = $v;
+					$newdata[$k] = addslashes($v);
 				}
 			}
-
+			
 			return $newdata;
 		} else {
 			$this->show_message('模型不存在,或没有设置字段.');
@@ -174,9 +196,9 @@ class contentController extends helper_baseadminController {
 	 * @return
 	 */
 	public function add() {
-		if(core::gpc('dosubmit', 'P')) {//提交信息
+		if(gpc('dosubmit', 'P')) {//提交信息
 
-			$content_data = core::gpc('data', 'P');
+			$content_data = gpc('data', 'P');
 			//检查字段，并且删除模型字段中没有的字段，进行重组返回
 			$return_data = $this->check_filed($content_data['modelid'], $content_data);
 			$this->content_db->set_model($return_data['modelid']);
@@ -191,11 +213,11 @@ class contentController extends helper_baseadminController {
 						);
 
 			$return_data['createtime'] = time();
-			$return_data['operate'] = array2string($operate);
+			$return_data['operate'] = json_encode($operate);
 
 			//插入数据
 			if($this->content_db->insert($return_data)) {
-				$ref_url = (core::gpc('dosubmit', 'P') == '提交并继续发表') ?
+				$ref_url = (gpc('dosubmit', 'P') == '提交并继续发表') ?
 						    get_url('admin', 'content', 'add', 'catid='.$content_data['catid']) : 
 						    get_url('admin', 'content', 'content_list', 'catid='.$content_data['catid']);
 				$this->show_message('操作成功.', '', $ref_url);
@@ -222,9 +244,9 @@ class contentController extends helper_baseadminController {
 	 * @return
 	 */
 	public function edit() {
-		if(core::gpc('dosubmit', 'P')) {//提交信息
-			$id = core::gpc('id', 'P');
-			$content_data = core::gpc('data', 'P');
+		if(gpc('dosubmit', 'P')) {//提交信息
+			$id = gpc('id', 'P');
+			$content_data = gpc('data', 'P');
 			//检查字段，并且删除模型字段中没有的字段，进行重组返回
 			$return_data = $this->check_filed($content_data['modelid'], $content_data);
 			$this->content_db->set_model($return_data['modelid']);
@@ -239,7 +261,7 @@ class contentController extends helper_baseadminController {
 						);
 
 			$return_data['updatetime'] = time();
-			$return_data['operate'] = array2string($operate);
+			$return_data['operate'] = json_encode($operate);
 
 			//修改数据
 			if($this->content_db->update($return_data, array('id' => $id))) {
@@ -247,7 +269,7 @@ class contentController extends helper_baseadminController {
 			}
 		}
 
-		$id = core::gpc('id');
+		$id = gpc('id');
 		$data = $this->category;
 		empty($data) && $this->show_message('操作错误!');
 
@@ -273,7 +295,7 @@ class contentController extends helper_baseadminController {
 	 * @return
 	 */
 	public function delete() {
-		$id = intval(core::gpc('id'));
+		$id = intval(gpc('id'));
 		if(empty($this->category)) $this->show_message('操作错误.');
 
 		//切换表
@@ -287,7 +309,7 @@ class contentController extends helper_baseadminController {
 	 * 获取栏目信息
 	 */
 	public function get_category() {
-		$catid = core::gpc('catid', 'R');
+		$catid = gpc('catid', 'R');
 		if(empty($catid)) return false;
 
 		$data = $this->db->get_one($catid);
@@ -303,6 +325,8 @@ class contentController extends helper_baseadminController {
 		$model_info = $this->model_db->get_one($mid);
 		return $model_info;
 	}
+
+
 
 	public function __destruct() {
 		$this->db = $this->category = NULL;

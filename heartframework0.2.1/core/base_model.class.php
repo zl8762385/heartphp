@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  *  base_model.class.php 数据模型鸡肋 
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -20,11 +20,11 @@ abstract class base_model {
 	//表前缀
 	public $table_prefix = 'heart_';
 
-	private static $db_instance= array();//静态私有变量 用来保存实例以后的对象 避免重复new
-	private static $cache_instance = array();//静态私有变量 用来保存实例以后的对象 避免重复new
+	protected static $db_instance= array();//静态私有变量 用来保存实例以后的对象 避免重复new
+	protected static $cache_instance = array();//静态私有变量 用来保存实例以后的对象 避免重复new
 
 	public function __construct(&$conf) {
-		$this->conf = &$conf;
+		$this->conf = C();
 		$this->table_name = $this->table_prefix.$this->table_name;//设置默认完整表名
 
 	}
@@ -93,6 +93,18 @@ abstract class base_model {
 		}
 
 	}
+
+    /**
+     * $rt = $db->query("select * from heart_model");
+     * while($rt= $db->fetch_next()) {
+     * $rt_data[] = $rt;
+     * }
+     * @param $sql 直接执行sql 如果需要多表查询的话可以使用这个
+     * @return mixed
+     */
+    final public function query($sql = '') {
+        return $this->db->execute($sql);
+    }
 
 
 	/**

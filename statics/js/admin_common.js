@@ -28,6 +28,7 @@ function field_setting(fieldtype, id) {
 	});
 }
 
+
 jQuery(document).ready(function () {
 	//控制右侧菜单
 	//$('a[class^=current]').parents('ul').show().prev().addClass('current');

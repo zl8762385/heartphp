@@ -3,7 +3,7 @@
  *  字段配置文件
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -25,7 +25,7 @@ $config['filed_type'] = array(
 		'type' => 'varchar','length' => 100
 	),
 	'image' => array(
-		'type' => 'varchar','length' => 350
+		'type' => 'text'
 	),
 	'number' => array(
 		'type' => 'int'
@@ -34,7 +34,7 @@ $config['filed_type'] = array(
 		'type' => 'int'
 	),
 	'uploadfile' => array(
-		'type' => 'varchar','length' => 300
+		'type' => 'text'
 	)
 );
 
@@ -66,3 +66,5 @@ $config['check_pattern'] = array(
 	'电话号码' => '/^[0-9-]{6,13}$/',
 	'邮政编码' => '/^[0-9]{6}$/'
 );
+
+return $config;

@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * 后台管理系统 admin user
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang <zl8762385@163.com> <qq:979314>
+ * @author              zhangxiaoliang <zl8762385@163.com> <qq:3677989>
  * @lastmodify			2013.04.12
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -21,7 +21,7 @@ class userController extends helper_baseadminController {
 
 	//list
 	public function index () {
-		$page = core::gpc('p');
+		$page = gpc('p');
 		list($count, $lists) = $this->db->select_all('*', '', '', '', $page, $this->pagesize);
 		
 		$this->view->assign('groupdata', $this->db_group->grouplists());
@@ -33,8 +33,8 @@ class userController extends helper_baseadminController {
 
 	//add
 	public function add() {
-		if(core::gpc('dosubmit', 'R')) {
-			$data = core::gpc('data', 'P');
+		if(gpc('dosubmit', 'R')) {
+			$data = gpc('data', 'P');
 
 			$this->comm_check_data('_empty', $data['username'], '请输入用户名！', '', get_url('admin', 'user', 'add'));
 			$this->comm_check_data('_empty', $data['password'], '请输入密码！', '', get_url('admin', 'user', 'add'));
@@ -58,10 +58,10 @@ class userController extends helper_baseadminController {
 
 	//edit
 	public function edit(){
-		$id = core::gpc('id');
-		if(core::gpc('dosubmit', 'P')) {
-			$data = core::gpc('data', 'P');
-			$userid = core::gpc('userid', 'P');
+		$id = gpc('id');
+		if(gpc('dosubmit', 'P')) {
+			$data = gpc('data', 'P');
+			$userid = gpc('userid', 'P');
 
 			$this->comm_check_data('_empty', $data['username'], '请输入用户名！', '', get_url('admin', 'user', 'edit', 'id='.$userid));
 			$this->comm_check_data('_empty', $data['email'], '请输入邮箱！', '', get_url('admin', 'user', 'edit', 'id='.$userid));
@@ -102,7 +102,7 @@ class userController extends helper_baseadminController {
 
 	//delete
 	public function delete() {
-		$id = intval(core::gpc('id', 'R'));
+		$id = intval(gpc('id', 'R'));
 		$rt = $this->db->delete('userid='.$id);
 		if($rt) {
 			$rt && $this->show_message('数据删除成功！', '', get_url('admin', 'user', 'index'));
@@ -110,7 +110,6 @@ class userController extends helper_baseadminController {
 	}
 
 	public function __destruct() {
-		$this->db = NULL;
-		$this->db_group = NULL;
+		$this->db = $this->db_group = NULL;
 	}
 }

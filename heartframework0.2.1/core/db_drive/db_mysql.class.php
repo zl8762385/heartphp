@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  * db_mysql.class.php    MYSQL 鸡肋 
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -13,8 +13,8 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
 class db_mysql implements db_interface  {
 	private $conf;
 
-	private $last_query_sql = null;//最后一次执行的SQL语句
-	private $last_query = null;//最后一次请求句柄
+	protected $last_query_sql = null;//最后一次执行的SQL语句
+	protected $last_query = null;//最后一次请求句柄
 
 	public function __construct(&$conf) {
 		$this->conf = &$conf;
@@ -38,7 +38,16 @@ class db_mysql implements db_interface  {
 	private function connect() {
 		if(!is_array($this->conf)) return false;
 		$config = $this->conf;
-		$link = @mysql_connect($config['host'], $config['user'], $config['password'], $config['db_name']);
+
+
+		if(!empty($config['port'])) {
+			//设置端口
+			$server = "{$config['host']}:{$config['port']}";
+		} else {
+			$server = $config['host'];	
+		}
+
+		$link = @mysql_connect($server, $config['user'], $config['password'], $config['db_name']);
 		if(!$link) {
 			die('Error:Can\'t connect to database ' . $config ['db_name'] . ' of mysql server:' . $config ['host'] );
 		}
@@ -71,6 +80,11 @@ class db_mysql implements db_interface  {
 			core::show_error('MySQL Query Error: <br/>'.$sql.' <br/>'. mysql_error());
 		}
 
+		//DEBUG模式 记录执行sql
+		if(DEBUG && isset($_SERVER['sqls'])) {
+			array_push($_SERVER['sqls'], $sql);
+		}
+
 		return $this->last_query;
 	}
 
@@ -83,10 +97,6 @@ class db_mysql implements db_interface  {
 		//不是资源类型，或者非正常断开，重新连接
 		if(!is_resource($this->mlink) || !mysql_ping($this->mlink)) {
 			$this->connect();
-		}
-		//DEBUG模式 记录执行sql
-		if(DEBUG && isset($_SERVER['sqls'])) {
-			array_push($_SERVER['sqls'], $sql);
 		}
 
 		return $this->query($sql, $this->mlink);

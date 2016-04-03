@@ -1,8 +1,10 @@
 @import url('reset.css');
+
+.diy_button {width:55px;height:30px;}
 /*--------------------------BODY--------------------------*/
 body {
-background:#f0f0f0;
-padding:0 20px;
+/*background:#f0f0f0;*/
+padding:0 10px;
 font-family: Lucida Grande, Verdana, Arial, sans-serif;
 }
 
@@ -171,7 +173,7 @@ text-align:left;
 }
 
 #submenu .title {
-width:310px;
+width:370px;
 line-height:49px;
 left:50%;
 margin-left:-90px;
@@ -629,13 +631,14 @@ table tr:hover td {background:#e4e4e4;}
 table th {
 background:#d0d0d0 url(../images/admin/box_c.png) repeat-x top left;
 font-size:13px;
-font-weight:400;
+font-weight:800;
 color:#444;
 border-bottom:1px solid #999a9b;
 text-align:left;
 font-family:"Lucida Sans Unicode","Lucida Grande",Sans-Serif;
 line-height:19px;
 padding:8px;
+
 }
 
 table td {
@@ -862,6 +865,7 @@ a.button .icon {background-image:url(../images/admin/icons_gray.png);}
 /*-------------------------ICONS-------------------------*/
 
 .margin_top_10 {margin:10px 0 0 0;}
+.margin_top_5 {margin:5px 0 0 0;}
 
 .pagination {text-align: right;padding: 20px 0 5px 0;font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 10px;}
 .pagination a {margin: 0 5px 0 0;padding: 3px 6px;}

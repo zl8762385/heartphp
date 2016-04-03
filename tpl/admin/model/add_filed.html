@@ -1,59 +1,49 @@
 <{include file="public/header.html"}> 
-
-<div class="col w10 margin_top_10 buttons_demo">
-    <a href="<{echo get_url('admin', 'model', 'filed', 'id='.$m_id)}>" class="button"><span>列表</span></a>
-    <a href="<{echo get_url('admin', 'model', 'add_filed', 'id='.$m_id)}>" class="button"><span>增加字段</span></a>
+<style type="text/css">
+  .select2{width:100px;height:35px;font-size: 14px;}
+</style>
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    <li><a href="<{echo get_url('admin', 'model', 'index')}>">模型列表</a></li>
+    <li><a href="<{echo get_url('admin', 'model', 'filed', 'id='.$m_id)}>">字段列表</a></li>
+    <li><a href="">添加字段</a></li>
+    </ul>
 </div>
 
-<div class="col w10">
+<div class="formbody">
+    
+    <div class="formtitle"><span>基本信息</span></div>
           <form action="<{echo get_url('admin', 'model', 'add_filed')}>" method="post">
-            <fieldset>
-            <!-- Set class to "column-left" or "column-right" on fieldsets to divide the form into columns -->
-           
-            <p>
-              <label>所在模型</label>
-               <{echo form::input("m_id", core::gpc('id'), 'hidden')}>
-               <{echo $model_info['name']}> 
-            </p>
-            <p>
-              <label>标题</label>
-               <{echo form::input("data[title]")}>
-            </p>
-            <p>
-              <label>字段名</label>
-               <{echo form::input("data[name]")}>
-            </p>
-   
-            <p>
-              <label>字段类型</label>
-              <{echo form::select("data[type]", $filed_type, '', '<option value="0">请选择字段类型</option>', 'small-input', 'onchange="javascript:field_setting(this.value);"')}>
-            </p>
-            <span node-type="target_filed"></span>
+            <{echo get_token_input()}>
 
-            <p>
-              <label>字符长度取值范围</label>
-              最小 <{echo form::input("data[number_range][min]", '0', 'text', 'text w_5')}>　
-                　最大 <{echo form::input("data[number_range][max]", '', 'text', 'text w_5')}>
-            </p>
+    <ul class="forminfo">
+      <!-- <li><label>文章标题</label><input name="" type="text" class="dfinput" /><i>标题不能超过30个字符</i></li> -->
+    
+      <li style="line-height:35px;"><label>所在模型</label><{echo form::input("m_id", gpc('id'), 'hidden')}>
+               <{echo $model_info['name']}> </li>
 
-            <p style="overflow:hidden">
-              <label>数据校验正则</label>
-              <{echo form::input("data[pattern]", '', 'text', 'text w_15', 'pattern')}>
+      <li><label>标题</label><{echo form::input("data[title]")}></li>
+      <li><label>字段名</label><{echo form::input("data[name]")}></li>
+      <li><label>字段类型</label>
+      
+      <{echo form::select("data[type]", $filed_type, '', '<option value="0">请选择字段类型</option>', 'small-input', 'onchange="javascript:field_setting(this.value);"')}>
+      
+      <span node-type="target_filed"></span>
+      </li>
+      <li><label>字符取值范围</label>
+      最小 <input type="text" name="data[number_range][min]" id="data[number_range][min]" value="0" class="dfinput" style="width:50px">
+      最大 <input type="text" name="data[number_range][max]" id="data[number_range][max]" value="" class="dfinput" style="width:50px;">
+      </li>
+      <li><label>数据校验正则</label>
+      <{echo form::input("data[pattern]", '', 'text', 'text w_15', 'pattern')}>
               <{echo form::select('pattern_select', $pattern, '', '', '', 'onchange="javascript:$(\'#pattern\').val(this.value)"', 'float:left;margin:0 5px 0 0;')}>
-  
-            </p>
-
-            <p style="width:500px;">
-              <label>描述</label>
-               <{echo form::textarea("data[description]")}>
-            </p>
-           
-
-            <p>
-              <input class="button" type="submit" name="dosubmit" value="提交" />
-            </p>
-            </fieldset>
-            <div class="clear"></div>
-            <!-- End .clear -->
-          </form>
+      </li>
+      <li><label>描述</label><{echo form::textarea("data[description]", '', '', '', 'textinput')}></li>
+     
+      <li><label>&nbsp;</label><input name="dosubmit" type="submit" class="btn" value="确认保存"/></li>
+    </ul>
+</form>    
 </div>
+

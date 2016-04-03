@@ -4,19 +4,18 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  *  base_controller.class.php   控制器基础类
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
  */
 
-class base_controller {
+abstract class base_controller {
 	protected $view;
 	protected $conf;
 	
 	public function __construct() {
-		global $conf;
-		$this->conf = &$conf;
+		$this->conf = C('');
 		$this->view = new template($this->conf);//全局变量传递给template
 	}
 
@@ -57,5 +56,14 @@ class base_controller {
 	public function page($count=0, $pagesize=10) {
 		$page = new page($count,$pagesize, $this->conf);
 		return $page->getPage();
+	}
+
+	/**
+	 * 生成唯一令牌
+	 * @return [type] [description]
+	 */
+	public function gen_token() {
+		$token = md5(uniqid(rand(), true));
+		return $token;
 	}
 }

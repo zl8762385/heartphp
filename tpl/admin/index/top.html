@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>无标题文档</title>
+<link href="<{$config['static_path_css']}>admin/style.css" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="<{$config['static_path_js']}>jquery-1.7.2.min.js"></script>
+<script type="text/javascript">
+$(function(){	
+	//顶部导航切换
+	$(".nav li a").click(function(){
+		$(".nav li a.selected").removeClass("selected")
+		$(this).addClass("selected");
+	})	
+})
+
+
+function left_onoff(){ 
+    if(parent.myFrame.cols == "187,*") {  
+        parent.myFrame.cols="0,*";  
+        // document.getElementById("ImgArrow").src="../images/arrow_r.gif";  
+        document.getElementById("left_nav").innerHTML="打开左侧导航栏";  
+    } else {  
+        parent.myFrame.cols="187,*"; 
+        // document.getElementById("ImgArrow").src="../images/arrow_l.gif";  
+        document.getElementById("left_nav").innerHTML="隐藏左侧导航栏";  
+    }  
+}  
+</script>
+
+
+</head>
+
+<body>
+
+    <div class="topleft">
+    <a href="main.html" target="_parent"><img src="<{$config['static_path_images']}>newlogo_1.jpg" title="系统首页" /></a>
+    </div>
+
+    <ul class="nav">
+    <{foreach from=$menu_mater item=v key=k}>
+		<li><a href="<{$config['domain']}>index.php?d=admin&c=index&a=left&menuid=<{$v['id']}>" target="leftFrame" <{if empty($k)}>class="selected"<{/if}>><h2><{$v['name']}></h2></a></li>
+	<{/foreach}>
+    </ul>
+            
+    <div class="topright">    
+		<ul>
+			<li ><a href="javascript:left_onoff()"><span id="left_nav" style="color:red;font-weight:800;">隐藏左侧导航栏</span></a></li>
+			<li>欢迎您 <{$userinfo['groupinfo']['name']}>：<{$userinfo['username']}></li>
+			<li><a href="<{echo get_url('admin', 'index', 'logout')}>" target="_parent">退出</a></li>
+		</ul>
+    </div>
+
+</body>
+</html>

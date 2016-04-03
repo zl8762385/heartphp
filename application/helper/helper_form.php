@@ -4,7 +4,7 @@ if(!defined('IS_HEARTPHP')) exit('Access Denied');
  *  助手工具包 form转换 input html
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.05.28
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -41,10 +41,10 @@ class helper_form extends base_Controller {
 	 */
 	public function text($filed_data) {
 		$input_arr = array();
-		$settings = string2array($filed_data['settings']);
+		$settings = json_decode($filed_data['settings'],1);
 		
 		$settings['text_style'] = (isset($settings['text_style'])) ? $settings['text_style'] : '' ;
-		$input['input'] = form::input("data[{$filed_data['name']}]", $this->update_infos, 'text', 'text w_15', '', "{$settings['text_style']}");
+		$input['input'] = form::input("data[{$filed_data['name']}]", $this->update_infos, 'text', 'dfinput', '', "{$settings['text_style']}");
 		$input['name'] = $filed_data['title'];
 		return $input;
 	}
@@ -56,12 +56,12 @@ class helper_form extends base_Controller {
 	 */
 	public function textarea($filed_data) {
 		$input_arr = array();
-		$settings = (empty($filed_data['settings'])) ? array() : string2array($filed_data['settings']) ;
+		$settings = (empty($filed_data['settings'])) ? array() : json_decode($filed_data['settings'],1) ;
 
 		$width = (isset($settings['width'])) ? $settings['width'] : '' ;
 		$height = (isset($settings['height'])) ? $settings['height'] : '' ;
 
-		$input['input'] = form::textarea("data[{$filed_data['name']}]", $this->update_infos, '', '', '', "width:{$width};height:{$height}");
+		$input['input'] = form::textarea("data[{$filed_data['name']}]", $this->update_infos, '', '', 'textinput', "width:{$width};height:{$height}");
 		$input['name'] = $filed_data['title'];
 		return $input;
 	}
@@ -73,7 +73,7 @@ class helper_form extends base_Controller {
 	 */
 	public function editor($filed_data) {
 		$input_arr = array();
-		$settings = (empty($filed_data['settings'])) ? array() : string2array($filed_data['settings']) ;
+		$settings = (empty($filed_data['settings'])) ? array() : json_decode($filed_data['settings'],1) ;
 
 		$width = (isset($settings['width'])) ? $settings['width'] : '' ;
 		$height = (isset($settings['height'])) ? $settings['height'] : '' ;
@@ -90,15 +90,10 @@ class helper_form extends base_Controller {
 	 */
 	public function image($filed_data) {
 		$input_arr = array();
-		$settings = (empty($filed_data['settings'])) ? array() : string2array($filed_data['settings']) ;
+		$settings = (empty($filed_data['settings'])) ? array() : json_decode($filed_data['settings'],1) ;
 
-		$update_infos = array();
-		if(strpos($this->update_infos, ',') !== false) {
-			$update_infos = explode(',', $this->update_infos);
-			$update_infos = array_filter($update_infos);
-		}
-
-		$input['input'] = form::uploadfile($filed_data['name'], 'images', "data[{$filed_data['name']}][]", $update_infos);
+		$update_infos = json_decode($this->update_infos,1);
+		$input['input'] = form::uploadfile($filed_data['name'], 'images', $filed_data['name'], $update_infos);
 		$input['name'] = $filed_data['title'];
 		return $input;
 	}
@@ -122,7 +117,7 @@ class helper_form extends base_Controller {
 	 */
 	public function datetime($filed_data) {
 		$input_arr = array();
-		$settings = (empty($filed_data['settings'])) ? array() : string2array($filed_data['settings']) ;
+		$settings = (empty($filed_data['settings'])) ? array() : json_decode($filed_data['settings'],1) ;
 		$date_format = (isset($settings['date_format'])) ? $settings['date_format'] : 'yyyy-MM-dd' ;
 
 		$date = '';
@@ -150,15 +145,16 @@ class helper_form extends base_Controller {
 	 */
 	public function uploadfile($filed_data) {
 		$input_arr = array();
-		$settings = (empty($filed_data['settings'])) ? array() : string2array($filed_data['settings']) ;
-
+		$settings = (empty($filed_data['settings'])) ? array() : json_decode($filed_data['settings'],1) ;
+/*
 		$update_infos = array();
 		if(strpos($this->update_infos, ',') !== false) {
 			$update_infos = explode(',', $this->update_infos);
 			$update_infos = array_filter($update_infos);
 		}
-
-		$input['input'] = form::uploadfile($filed_data['name'], 'files', "data[{$filed_data['name']}][]", $update_infos);
+*/
+		$update_infos = json_decode($this->update_infos,1);
+		$input['input'] = form::uploadfile($filed_data['name'], 'files', $filed_data['name'], $update_infos);
 		$input['name'] = $filed_data['title'];
 		return $input;
 	}
@@ -170,7 +166,7 @@ class helper_form extends base_Controller {
 	 */
 	public function box($filed_data) {
 		$input_arr = array();
-		$settings = (empty($filed_data['settings'])) ? array() : string2array($filed_data['settings']) ;
+		$settings = (empty($filed_data['settings'])) ? array() : json_decode($filed_data['settings'],1) ;
 
 		if(isset($settings['boxtype'])) {
 			$boxtype = $settings['boxtype'];

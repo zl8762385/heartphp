@@ -3,7 +3,7 @@
  *  swfupload FLASH上传文件配置
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.6.17
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -18,15 +18,19 @@
 $config = array();
 
 $config['images'] = array(
+	'type' => 'images',
 	'ext' => 'gif|png|bmp|jpeg|jpg|psd',
-	'allow_multi' => 1,
+	'allow_multi' => 11,
 	'dir' => 'att_images/',//必须设置目录，否则会出错,在根目录/data/uploadfiles子目录里
 	'filesize' => 20971520
 );//图片
 
 $config['files'] = array(
-	'ext' => 'doc|docx|xls|xlsx|ppt|htm|html|txt|zip|rar|gz|bz2|apk',
+	'type' => 'files',
+	'ext' => 'doc|docx|xls|xlsx|ppt|htm|html|txt|zip|rar|gz|bz2',
 	'allow_multi' => 1,
 	'dir' => 'att_files/',//必须设置目录，否则会出错,在根目录/data/uploadfiles子目录里
 	'filesize' => 20971520
 );//文件
+
+return $config;

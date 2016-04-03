@@ -1,6 +1,61 @@
- <{include file="public/header.html"}> 
-<div class="col w10 buttons_demo" style="margin:20px 0 0 0;">
-   <table border="0" cellspacing="1" cellpadding="3" class="table1">
+<{include file="public/header.html"}>
+      <script type="text/javascript">
+        var domain = '<{$config['domain']}>';
+
+      jQuery(document).ready(function($) {
+        
+        $('a[rel*=facebox]').facebox();
+
+
+        //统计信息
+          $.get(domain+'index.php?d=admin&c=index&a=stat_infos', function (rt) {
+            var json = $.parseJSON(rt), online_str = [];
+            if(!json) return false;
+            if(json['users_total']['total']) {
+              $('[node-type=stat_total]').html(json['users_total']['total']);
+            }
+
+            if(json['users_online']) {
+              for(var i in json['users_online']){
+                online_str[i] = json['users_online'][i]['username'];
+              }
+              online_str = online_str.join(', ');
+              $('[node-type=online_users]').html(online_str);
+            }
+          });
+
+        
+      });
+      
+      // function setTime() {
+     //        var currentTime = new Date().toLocaleString();
+     //        document.getElementById("htmer_time").innerHTML=currentTime;
+     //    }
+        // setInterval(setTime,1000);
+
+        //更新用户活动信息
+        function user_life() {
+          $.get(domain+'/index.php?d=admin&c=index&a=user_life');
+        }
+        user_life();
+        setInterval(user_life, 35000);
+    </script>
+
+
+<script type="text/javascript">
+    $('.tablelist tbody tr:odd').addClass('odd');
+</script>
+
+<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">管理首页</a></li>
+    </ul>
+</div>
+<div class="rightinfo">
+
+
+          <table class="tablelist">
         <tr>
           <th width="90">框架开发</th>
           <td width="210">张晓亮</td>
@@ -27,13 +82,21 @@
           <th>服务器时间</th>
           <td><?php echo date("Y-m-d H:i:s")?></td>
         </tr>
+
+        <tr>
+          <th>所有管理员</th>
+          <td><label node-type="stat_total">0</label></td>
+          <th>当前在线管理员</th>
+          <td><div style="line-height:30px;font-weight:800;" node-type="online_users">
+                          null
+                        </div></td>
+        </tr>
+
+
         <tr>
             <th>根目录</th>
             <td colspan="3"><?php echo $_SERVER['DOCUMENT_ROOT']; ?></td>
         </tr>
-
-      <th>Apache模块:</th>
-      <td colspan="3"><?php echo implode(', ', (array) apache_get_modules()); ?></td>
     </tr>
 
     </table>

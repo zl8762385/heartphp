@@ -3,7 +3,7 @@
  *  form.class.php  表单
  *
  * @copyright			(C) 20013-2015 HeartPHP
- * @author              zhangxiaoliang  <zl8762385@163.com> <qq:979314>  
+ * @author              zhangxiaoliang  <zl8762385@163.com> <qq:3677989>  
  * @lastmodify			2013.04.19
  *
  * 您可以自由使用该源码，但是在使用过程中，请保留作者信息。尊重他人劳动成果就是尊重自己
@@ -14,15 +14,19 @@ class form {
 	static public function static_func($type) {
 		switch($type) {
 			case 'js':
-				return core::load_config('config', 'static_path_js');
+				return C('static_path_js', 'config');
+			break;
+			case 'css':
+				return C('static_path_css', 'config');
 			break;
 			case 'images':
-				return core::load_config('config', 'static_path_images');
+				return C('static_path_images', 'config');
 			break;
 			case 'domain':
-				return core::load_config('config', 'domain');
+				return C('domain', 'config');
 			break;
 		}
+
 	}
 	/**
 	 * jquery.uploadify 上传图片
@@ -34,13 +38,17 @@ class form {
 	 */
 	static public function uploadfile($id = 'uploadify', $upload_type = 'images', $form_name = '', $default_value = array()) {
 		$path_js = self::static_func('js');
+
 		$path_images = self::static_func('images');
 		$domain = self::static_func('domain');
 		$ref_url = urlencode($_SERVER['REQUEST_URI']);
-		$swfupload_config = core::load_config('swfupload', $upload_type);
+
+		$swfupload_config = C($upload_type, 'swfupload');
+
+		$swfupload_type = (isset($swfupload_config['type'])) ? $swfupload_config['type'] : '' ;
 
 		//button images and files
-		$buttom_class = ($upload_type == 'images') ? 'IMGButtonUploadText1_61x22.png' : 'FileButtonUploadText1_61x22.png' ;
+		$buttom_class =  ($swfupload_type == 'images')? 'IMGButtonUploadText1_61x22.png' : 'FileButtonUploadText1_61x22.png' ;
 
 		//拆分 后缀
 		$file_types = '*.*';
@@ -56,26 +64,29 @@ class form {
 		}
 
 		//是否多图
-		$allow_multi = (empty($swfupload_config['allow_multi'])) ? 1 : 100 ;//默认不允许多图,多图默认最多10个
-		$upload_url = ($upload_type == 'files') ? 'uploader_files' : 'uploader_images' ;
+		$allow_multi = (isset($swfupload_config['allow_multi'])) ? $swfupload_config['allow_multi'] : 1 ;//默认不允许多图,多图默认最多10个
+
+
+		$upload_url = ($swfupload_type == 'files') ? 'uploader_files' : 'uploader_images' ;
 
 		//修改数据 默认图片
 		$update_html = $update_input_html = '';
 
 		if(is_array($default_value)) {
-			foreach($default_value as $k_img => $v_img) {
-				$update_input_html .= '<input type="hidden" name="'.$form_name.'" node-type="input_'.$id.'_'.$k_img.'" value="'. $v_img .'" />';
+
+			foreach($default_value as $k_img => $v) {
+
+				$update_input_html .= '<input type="hidden" name="data['.$form_name.'][]" node-type="input_'.$id.'_'.$k_img.'" value="'. $v['filename'] .'" />';
 				$update_html .= '<div class="uploadfile_images_td" node-type="div_'.$id.'_'.$k_img.'">';
 					
-						if($upload_type == 'images'){
-							$update_html .= '<a href="'. $v_img .'" target="_blank">';
-								$update_html .= '<img src="'. $v_img .'"/>';
+						if($swfupload_type == 'images'){
+							$update_html .= '<a href="'. $v['filename'] .'" target="_blank">';
+								$update_html .= '<img src="'. $v['filename'].'"/>';
 							$update_html .= '</a>';
 						} else {
-							$update_html .= '<input type="text" value="'. $v_img .'"/>';
+							$update_html .= '<input type="text" value="'. $v['filename'] .'"/>';
 						}
-						
-					
+						$update_html .= '<br/><input name="data['.$form_name.'][pic_title]['.$v['filename'].']" class="text w_15" type="text" value="'.$v['title'].'"/>';
 					$update_html .= '<div><input type="button" value="删除" onclick="del_uploadfiles'.$id.'('.$k_img.')"/></div>';
 				$update_html .= '</div>';	
 			}
@@ -109,14 +120,14 @@ class form {
 				debug: true,
 				custom_settings : {something : "here"},
 				debug_handler : function (d) {
-					console.log(d);
+					// console.info(d);
 				}
 			})
 				.bind('swfuploadLoaded', function(event){
 					$('#log').append('<li>Loaded</li>');
 				})
 				.bind('fileQueued', function(event, file){
-					console.log(file+'===');
+					//console.log(file+'===');
 					$('#log').append('<li>File queued - '+file.name+'</li>');
 					// start the upload since it's queued
 					$(this).swfupload('startUpload');
@@ -125,14 +136,14 @@ class form {
 					$('#log').append('<li>File queue error - '+message+'</li>');
 				})
 				.bind('fileDialogStart', function(event){
-					console.log('<li>File dialog start</li>')
+					//console.log('<li>File dialog start</li>')
 					$('#log').append('<li>File dialog start</li>');
 				})
 				.bind('fileDialogComplete', function(event, numFilesSelected, numFilesQueued){
 					if(numFilesSelected > numFilesQueued) {
 						alert('超出数量');
 					}
-					console.log(numFilesSelected+'=='+numFilesQueued)
+					//console.log(numFilesSelected+'=='+numFilesQueued)
 					$('#log').append('<li>File dialog complete</li>');
 				})
 				.bind('uploadStart', function(event, file){
@@ -143,9 +154,14 @@ class form {
 				})
 				.bind('uploadSuccess', function(event, file, serverData){
 					var serverData = $.parseJSON(serverData);
+					if(!serverData) {
+						alert('上传文件出错，请联系管理员！.');
+						return false;
+					}
 					var files_name = serverData.filepath+serverData.filename;
 					var length = $('[id={$id}]').length;
-					var upload_type = '{$upload_type}';
+					var upload_type = '{$swfupload_type}';
+					//console.info(serverData);
 					//console.log(serverData)
 
 					switch(serverData.flag) {
@@ -160,6 +176,7 @@ class form {
 					        	} else {
 					        		html += '<input type="text" value="'+ files_name +'"/>';
 					        	}
+				        		html += '<br/><input name="data[{$form_name}][pic_title]['+files_name+']" class="text w_15" type="text" value=""/>';
 					            
 					        
 					       html += '<div><input type="button" value="删除" onclick="del_uploadfiles{$id}('+length+')"/></div>';
@@ -167,7 +184,7 @@ class form {
 					    html += '</div>';
 
 					    //$('#{$id}').
-						$('#uploadfiles_{$id}').append(html).prepend('<input node-type="input__{$id}_'+length+'" type="hidden" name="{$form_name}" id="{$id}" value="'+ files_name +'" />');
+						$('#uploadfiles_{$id}').append(html).prepend('<input node-type="input__{$id}_'+length+'" type="hidden" name="data[{$form_name}][]" id="{$id}" value="'+ files_name +'" />');
 						break;
 						case '-1':
 							alert('文件类型不允许.');
@@ -179,20 +196,20 @@ class form {
 					//$('#log').append('<li>Upload success - '+file.name+'</li>');
 				})
 				.bind('uploadComplete', function(event, file){
-
+					//console.info(file);
 					$('#log').append('<li>Upload complete - '+file.name+'</li>');
 					// upload has completed, lets try the next one in the queue
 					$(this).swfupload('startUpload');
 				})
 				.bind('uploadError', function(event, file, errorCode, message){
-
+					//console.info(event);
 					$('#log').append('<li>Upload error - '+message+'</li>');
 				});
 		});	
 		</script>
 		<div id="{$id}_id">
 		      <input type="button" id="button{$id}"/>
-		      <input type="hidden" name="{$form_name}" value=''/>
+		      <input type="hidden" name="data[{$form_name}][]" value=''/>
 		      <div class="uploadfile_images_table" id="uploadfiles_{$id}">
 		      		{$update_input_html}
 			    	{$update_html}
@@ -217,13 +234,16 @@ EOF;
 		$ref_url = urlencode($_SERVER['REQUEST_URI']);
 
 		$path_js = self::static_func('js');
+		$path_css = self::static_func('css');
 		$id = (empty($id)) ? $name : $id ;
 		$html =<<<EOF
+		<link href="{$path_css}/kindeditor/themes/default/default.css" type="text/css"/>
+		<script type="text/javascript" src="{$path_js}/kindeditor/kindeditor.js"></script>
 		<script>
 			KindEditor.ready(function(K) {
-				var editor1 = K.create('textarea[id="{$id}"]', {
+				var editor_{$id} = K.create('textarea[id="{$id}"]', {
 					uploadJson :'{$domain}index.php?d=admin&c=upload&a=uploader_images&type=editer&ref={$ref_url}',
-					themeType : 'simple',
+					
 					items : ['source', '|', 'fullscreen', 'undo', 'redo', 'print', 'cut', 'copy', 'paste', 'plainpaste', 'wordpaste', '|', 'justifyleft', 'justifycenter', 'justifyright', 'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', 'subscript', 'superscript', '|', 'selectall', '-', 'title', 'fontname', 'fontsize', '|', 'textcolor', 'bgcolor', 'bold','italic', 'underline', 'strikethrough', 'removeformat', '|', 'image', 'flash', 'media', 'advtable', 'hr', 'emoticons', 'link', 'unlink']
 				});
 			});
@@ -265,7 +285,7 @@ EOF;
 	 * @param $style style
 	 * @return text html
 	 */
-	static public function input($name, $value = '', $type = 'text', $class = 'text w_15', $id = '', $style='') {
+	static public function input($name, $value = '', $type = 'text', $class = 'dfinput', $id = '', $style='') {
 		$id = (empty($id)) ? $name : $id ;
 		$style = (empty($style)) ? '' : 'style="'.$style.'"' ;
 		return '<input '.$style.' class="'.$class.'" value="'.$value.'" type="'.$type.'" id="'.$id.'" name="'.$name.'" />';
@@ -360,11 +380,11 @@ EOF;
 	 * @param $style style
 	 * @return select html
 	 */
-	static public function select($name, $data,$selected_key = '', $first_option = '', $class = 'small-input', $onevent = '', $style = '', $id = '') {
+	static public function select($name, $data,$selected_key = '', $first_option = '', $class = 'select2', $onevent = '', $style = '', $id = '') {
 	
 		$style = (empty($style)) ? '' : 'style="'.$style.'"' ;
 		$id = (empty($id)) ? $name : $id ; 
-		$html = '<select name="'.$name.'" id="'.$id.'" class="'.$class.'" '.$onevent.' '.$style.'>';
+		$html = '<select name="'.$name.'" id="'.$id.'" class="system_select '.$class.'" '.$onevent.' '.$style.'>';
 			$html.= $first_option;
 			if(is_array($data)) {
 			 	foreach($data as $k => $v) {
